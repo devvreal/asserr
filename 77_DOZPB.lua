@@ -343,12 +343,12 @@ KillingCheats:CreateButton("View Ball", function()
 end)
 
 
-KillingCheats:CreateButton("Delete Clash Parts", function()
+KillingCheats:CreateButton("Delete Clash", function()
     local function deleteClashParts()
         while true do
             local clashParts = workspace:FindPartsInRegion3(workspace.CurrentCamera.CFrame.Position, Vector3.new(500, 500, 500), nil)
             for _, part in pairs(clashParts) do
-                if part.Name == "Clash" then
+                if part.Name == "clash" then
                     part:Destroy()
                 end
             end
