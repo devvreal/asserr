@@ -343,19 +343,27 @@ KillingCheats:CreateButton("View Ball", function()
 end)
 
 
-KillingCheats:CreateButton("Delete Clash", function()
-    local function deleteClashParts()
-        while true do
-            local clashParts = workspace:FindPartsInRegion3(workspace.CurrentCamera.CFrame.Position, Vector3.new(500, 500, 500), nil)
-            for _, part in pairs(clashParts) do
-                if part.Name == "clash" then
-                    part:Destroy()
-                end
+local function deleteClashParts()
+    while true do
+        local clashParts = workspace:FindPartsInRegion3(workspace.CurrentCamera.CFrame.Position, Vector3.new(500, 500, 500), nil)
+        for _, part in pairs(clashParts) do
+            if part.Name:lower() == "clash" then
+                part:Destroy()
             end
-            task.wait(1) 
         end
+        task.wait(1)  -- Adjust the wait time as needed
     end
+end
+
+local deleteClashTask = nil
+
+KillingCheats:CreateButton("Delete Clash Parts", function()
+    if deleteClashTask then
+        deleteClashTask:Disconnect()
+    end
+    deleteClashTask = RunService.Heartbeat:Connect(deleteClashParts)
 end)
+
 
 KillingCheats:CreateButton("Discord Server", function()
     setclipboard("https://discord.gg/24SCQ6GN9Q")
