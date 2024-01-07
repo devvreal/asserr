@@ -1,12 +1,12 @@
+local GAME_ID = "13772394625"
+if game.GameId ~= GAME_ID then
+    game.Players.LocalPlayer:Kick("nibba this script aint for this shit only blade ball")
+    return
+end
+
 local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
 local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
 local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
-local ExpectedGameId = 13772394625  
- 
-if game.GameId ~= ExpectedGameId then
-    game.Players.LocalPlayer:Kick("nigga this script aint for this shit only blade ball")
-    return
-end
 
 local Window = Fluent:CreateWindow{
     Title = "Noxine",
