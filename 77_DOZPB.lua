@@ -349,7 +349,7 @@ end
 
 local Ap = Tabs.Main:AddToggle("Ap", {
     Title = "Auto Parry",
-    Description = "Parries the ball every time the user is being targeted.",
+    Description = "Parries the ball every time the user is being targetded ",
     Default = false 
 })
 
@@ -360,7 +360,7 @@ end)
 
 local As = Tabs.Main:AddToggle("As", {
     Title = "Auto Spam",
-    Description = "Automatically starts spamming based on the ball speed.",
+    Description = "Automatically starts spamming based on the ball speed ",
     Default = false 
 })
 
