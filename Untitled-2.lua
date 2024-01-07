@@ -1,6 +1,12 @@
 local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
 local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
 local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
+local ExpectedGameId = 13772394625  
+ 
+if game.GameId ~= ExpectedGameId then
+    game.Players.LocalPlayer:Kick("nigga this script aint for this shit only blade ball")
+    return
+end
 
 local Window = Fluent:CreateWindow{
     Title = "Noxine",
@@ -349,7 +355,7 @@ end
 
 local Ap = Tabs.Main:AddToggle("Ap", {
     Title = "Auto Parry",
-    Description = "Parries the ball every time the user is being targeted.",
+    Description = "Parries the ball every time the user is being targeted ",
     Default = false 
 })
 
@@ -360,7 +366,7 @@ end)
 
 local As = Tabs.Main:AddToggle("As", {
     Title = "Auto Spam",
-    Description = "Automatically starts spamming based on the ball speed.",
+    Description = "Automatically starts spamming based on the ball speed ",
     Default = false 
 })
 
