@@ -371,7 +371,7 @@ As:OnChanged(function()
     AutoSpam() 
 end)
 
-Tabs.Misc:AddButton({
+Tabs.Main:AddButton({
     Title = "View Ball",
     Description = "This feature continuously monitors the ball and is permanently enabled; it cannot be turned off.",
     Callback = function()
@@ -397,7 +397,7 @@ Tabs.Misc:AddButton({
     end
 })
 
-Tabs.Misc:AddButton({
+Tabs.Main:AddButton({
     Title = "Anti Lag",
     Description = "Deletes all particles and useless content.",
     Callback = function()
