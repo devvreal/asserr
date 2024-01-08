@@ -179,7 +179,7 @@ local function AutoParry()
     end
 
     Init()
-end 
+end
 
 local function AutoSpam()
     local function get_plr()
@@ -345,7 +345,7 @@ local function AutoSpam()
 
     getgenv().DetectSpam = true
     DetectSpam()
-end 
+end
 
 local Ap = Tabs.Main:AddToggle("Ap", {
     Title = "Auto Parry",
@@ -373,26 +373,26 @@ Tabs.Misc:AddButton({
     Title = "View Ball",
     Description = "This feature continuously monitors the ball and is permanently enabled; it cannot be turned off.",
     Callback = function()
-        while true do
-            for _, ball in next, workspace.Balls:GetChildren() do
-                if ball and ball:IsA("Part") then
-                    local localPlayer = game:GetService("Players").LocalPlayer
-                    local character = localPlayer.Character
-    
-                    if character then
-                        local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
-                        local humanoid = character:FindFirstChild("Humanoid")
-    
-                        if humanoidRootPart and humanoid then
-                            local lookVector = (ball.Position - humanoidRootPart.Position).Unit
-                            humanoidRootPart.CFrame = CFrame.new(humanoidRootPart.Position, humanoidRootPart.Position + Vector3.new(lookVector.X, 0, lookVector.Z))
-                        end
+while true do
+        for _, ball in next, workspace.Balls:GetChildren() do
+            if ball and ball:IsA("Part") then
+                local localPlayer = game:GetService("Players").LocalPlayer
+                local character = localPlayer.Character
+
+                if character then
+                    local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+                    local humanoid = character:FindFirstChild("Humanoid")
+
+                    if humanoidRootPart and humanoid then
+                        local lookVector = (ball.Position - humanoidRootPart.Position).Unit
+                        humanoidRootPart.CFrame = CFrame.new(humanoidRootPart.Position, humanoidRootPart.Position + Vector3.new(lookVector.X, 0, lookVector.Z))
                     end
                 end
             end
-            task.wait()
         end
-    end})
+        task.wait()
+    end
+end})
 
 Tabs.Misc:AddButton({
     Title = "Anti Lag",
@@ -418,13 +418,13 @@ end)
 end})
 
 Tabs.Credits:AddParagraph({
-    Title = "Credits",
-    Content = "Made by FBI and Devv!"
-})
-
+        Title = "Credits",
+        Content = "Made by FBI and Devv!"
+    })
+    
+    
 Tabs.Credits:AddButton({
     Title = "Discord Server",
     Callback = function()
-        setclipboard("https://discord.gg/seKswmQ3Um")
-    end
-})
+    setclipboard("https://discord.gg/seKswmQ3Um")
+    end})
