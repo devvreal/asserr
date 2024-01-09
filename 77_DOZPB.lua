@@ -11,8 +11,6 @@ local Window = Fluent:CreateWindow{
     Theme = "Darker",
     MinimizeKey = Enum.KeyCode.LeftControl
 }
-print("Fluent window created successfully ")
-
 
 local Tabs = {
     Main = Window:AddTab{
@@ -371,86 +369,62 @@ As:OnChanged(function()
     AutoSpam() 
 end)
 
-Tabs.Main:AddButton({
+Tabs.Misc:AddToggle({
     Title = "View Ball",
     Description = "This feature continuously monitors the ball and is permanently enabled; it cannot be turned off.",
     Callback = function()
-        while true do
-            for _, ball in next, workspace.Balls:GetChildren() do
-                if ball and ball:IsA("Part") then
-                    local localPlayer = game:GetService("Players").LocalPlayer
-                    local character = localPlayer.Character
+while true do
+        for _, ball in next, workspace.Balls:GetChildren() do
+            if ball and ball:IsA("Part") then
+                local localPlayer = game:GetService("Players").LocalPlayer
+                local character = localPlayer.Character
 
-                    if character then
-                        local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
-                        local humanoid = character:FindFirstChild("Humanoid")
+                if character then
+                    local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+                    local humanoid = character:FindFirstChild("Humanoid")
 
-                        if humanoidRootPart and humanoid then
-                            local lookVector = (ball.Position - humanoidRootPart.Position).Unit
-                            humanoidRootPart.CFrame = CFrame.new(humanoidRootPart.Position, humanoidRootPart.Position + Vector3.new(lookVector.X, 0, lookVector.Z))
-                        end
+                    if humanoidRootPart and humanoid then
+                        local lookVector = (ball.Position - humanoidRootPart.Position).Unit
+                        humanoidRootPart.CFrame = CFrame.new(humanoidRootPart.Position, humanoidRootPart.Position + Vector3.new(lookVector.X, 0, lookVector.Z))
                     end
                 end
             end
-            wait()
         end
+        task.wait()
     end
-})
+end})
 
-Tabs.Main:AddButton({
+Tabs.Misc:AddToggle({
     Title = "Anti Lag",
     Description = "Deletes all particles and useless content.",
     Callback = function()
-        local RunService = game:GetService("RunService")
+    local RunService = game:GetService("RunService")
 
-        local function removeParticleEmitters(object)
-            for _, descendant in pairs(object:GetDescendants()) do
-                if descendant:IsA("ParticleEmitter") then
-                    descendant:Destroy()
-                end
-            end
+local function removeParticleEmitters(object)
+    for _, descendant in pairs(object:GetDescendants()) do
+        if descendant:IsA("ParticleEmitter") then
+            descendant:Destroy()
         end
-
-        local function onRepeatRemoval()
-            removeParticleEmitters(workspace)
-        end
-
-        RunService.Heartbeat:Connect(function(deltaTime)
-            onRepeatRemoval()
-        end)
     end
-})
+end
 
+local function onRepeatRemoval()
+    removeParticleEmitters(workspace)
+end
+
+RunService.Heartbeat:Connect(function(deltaTime)
+    onRepeatRemoval()
+end)
+end})
+
+Tabs.Credits:AddParagraph({
+        Title = "Credits",
+        Content = "Made by FBI and Devv!"
+    })
+    
+    
 Tabs.Credits:AddButton({
     Title = "Discord Server",
     Callback = function()
-        setclipboard("https://discord.gg/seKswmQ3Um")
-    end
-})
-
- 
-Tabs.Credits:AddParagraph({
-    Title = "Credits",
-    Content = "Made by FBI and Devv!"
-})
-
-  
-local function SetupFluent()
-    SaveManager:SetLibrary(Fluent)
-    InterfaceManager:SetLibrary(Fluent)
-    SaveManager:IgnoreThemeSettings()
-    SaveManager:SetIgnoreIndexes({})
-    InterfaceManager:SetFolder("Noxine")
-    SaveManager:SetFolder("Noxine/BladeBall")
-    InterfaceManager:BuildInterfaceSection(Tabs.Settings)
-    SaveManager:BuildConfigSection(Tabs.Settings)
-    Window:SelectTab(1)
-    Fluent:Notify({
-        Title = "Noxine",
-        Content = "the script has been loaded.",
-        Duration = 8
-    })
-    SaveManager:LoadAutoloadConfig()
-end
- 
-SetupFluent()
+    setclipboard("https://discord.gg/seKswmQ3Um")
+    end})
