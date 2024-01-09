@@ -369,53 +369,55 @@ As:OnChanged(function()
     AutoSpam() 
 end)
 
-Tabs.Misc:AddToggle({
+Tabs.Misc:AddButton({
     Title = "View Ball",
     Description = "This feature continuously monitors the ball and is permanently enabled; it cannot be turned off.",
     Callback = function()
-while true do
-        for _, ball in next, workspace.Balls:GetChildren() do
-            if ball and ball:IsA("Part") then
-                local localPlayer = game:GetService("Players").LocalPlayer
-                local character = localPlayer.Character
+        while true do
+            for _, ball in next, workspace.Balls:GetChildren() do
+                if ball and ball:IsA("Part") then
+                    local localPlayer = game:GetService("Players").LocalPlayer
+                    local character = localPlayer.Character
 
-                if character then
-                    local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
-                    local humanoid = character:FindFirstChild("Humanoid")
+                    if character then
+                        local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+                        local humanoid = character:FindFirstChild("Humanoid")
 
-                    if humanoidRootPart and humanoid then
-                        local lookVector = (ball.Position - humanoidRootPart.Position).Unit
-                        humanoidRootPart.CFrame = CFrame.new(humanoidRootPart.Position, humanoidRootPart.Position + Vector3.new(lookVector.X, 0, lookVector.Z))
+                        if humanoidRootPart and humanoid then
+                            local lookVector = (ball.Position - humanoidRootPart.Position).Unit
+                            humanoidRootPart.CFrame = CFrame.new(humanoidRootPart.Position, humanoidRootPart.Position + Vector3.new(lookVector.X, 0, lookVector.Z))
+                        end
                     end
                 end
             end
+            task.wait()
         end
-        task.wait()
     end
-end})
+})
 
-Tabs.Misc:AddToggle({
+Tabs.Misc:AddButton({
     Title = "Anti Lag",
     Description = "Deletes all particles and useless content.",
     Callback = function()
-    local RunService = game:GetService("RunService")
+        local RunService = game:GetService("RunService")
 
-local function removeParticleEmitters(object)
-    for _, descendant in pairs(object:GetDescendants()) do
-        if descendant:IsA("ParticleEmitter") then
-            descendant:Destroy()
+        local function removeParticleEmitters(object)
+            for _, descendant in pairs(object:GetDescendants()) do
+                if descendant:IsA("ParticleEmitter") then
+                    descendant:Destroy()
+                end
+            end
         end
+
+        local function onRepeatRemoval()
+            removeParticleEmitters(workspace)
+        end
+
+        RunService.Heartbeat:Connect(function(deltaTime)
+            onRepeatRemoval()
+        end)
     end
-end
-
-local function onRepeatRemoval()
-    removeParticleEmitters(workspace)
-end
-
-RunService.Heartbeat:Connect(function(deltaTime)
-    onRepeatRemoval()
-end)
-end})
+})
 
 Tabs.Credits:AddParagraph({
         Title = "Credits",
