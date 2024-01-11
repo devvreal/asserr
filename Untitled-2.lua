@@ -14,7 +14,7 @@ local Storage = {
     LastTick = os.clock(),
     LastBallPosition = nil,
     AttemptedParry = false,
-    ParryCooldown = 2,  
+    ParryCooldown = 2,  -- Set the cooldown time in seconds
 }
 
 local function GetBall()
@@ -45,11 +45,6 @@ end
 
 local parryDebouncer = debounce()
 
-local function PredictedPosition(currentPosition, velocity, time)
-    local predictedPosition = currentPosition + velocity * time
-    return predictedPosition
-end
-
 local function AutoParry()
     if not Storage.AttemptedParry and parryDebouncer() then
         Remotes:WaitForChild("ParryButtonPress"):Fire()
@@ -63,19 +58,23 @@ game:GetService("RunService").PostSimulation:Connect(function()
         if Storage.LastBallPosition then
             if Player.Character:FindFirstChild("Highlight") then
                 local DeltaT = os.clock() - Storage.LastTick
-                local Velocity = (OtherBall.Position - Storage.LastBallPosition) / DeltaT
+                local VelocityX = (OtherBall.Position.X - Storage.LastBallPosition.X) / DeltaT
+                local VelocityY = (OtherBall.Position.Y - Storage.LastBallPosition.Y) / DeltaT
+                local VelocityZ = (OtherBall.Position.Z - Storage.LastBallPosition.Z) / DeltaT
+                local VelocityMagnitude = math.sqrt(VelocityX^2 + VelocityY^2 + VelocityZ^2)
 
                 local ServerPing = StatsService.Network.ServerStatsItem["Data Ping"]:GetValue()
                 local DistanceToPlayer = (Player.Character.HumanoidRootPart.Position - OtherBall.Position).Magnitude
-                local EstimatedTimeToReachPlayer = DistanceToPlayer / Velocity.magnitude
-                local TimeToParry = 0.2 * EstimatedTimeToReachPlayer
+                local EstimatedTimeToReachPlayer = (ServerPing / VelocityMagnitude) / (ServerPing / DistanceToPlayer)
+                local TimeToParry = 0.2 * (VelocityMagnitude / DistanceToPlayer)
 
-                local FutureBallPosition = PredictedPosition(OtherBall.Position, Velocity, TimeToParry)
+                -- Improve the timing calculation
+                local ClashWindow = 0.5  -- Set the clash window in seconds
+                local CurrentDistanceToPlayer = (Player.Character.HumanoidRootPart.Position - OtherBall.Position).Magnitude
+                local OptimalTimeToParry = CurrentDistanceToPlayer / VelocityMagnitude
 
-                local DistanceToFuturePosition = (Player.Character.HumanoidRootPart.Position - FutureBallPosition).Magnitude
-                local TimeToFuturePosition = DistanceToFuturePosition / Velocity.magnitude
-
-                if TimeToParry <= TimeToFuturePosition then
+                if EstimatedTimeToReachPlayer > (OptimalTimeToParry - ClashWindow / 2) and
+                   EstimatedTimeToReachPlayer < (OptimalTimeToParry + ClashWindow / 2) then
                     AutoParry()
                 else
                     Storage.AttemptedParry = false
