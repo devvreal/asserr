@@ -15,8 +15,8 @@ local Storage = {
     LastBallPosition = nil,
     AttemptedParry = false,
     ParryCooldown = 0.5,   
-    AutoParryInterval = 0.1,  
-    AutoParryDelay = 1.0,   
+    AutoParryInterval = 0.1,   
+    AutoParryDelay = 0.5,   
 }
 
 local function GetBall()
@@ -49,7 +49,7 @@ local parryDebouncer = debounce()
 
 local function autoParry()
     if not Storage.AttemptedParry and parryDebouncer() then
-        wait(Storage.AutoParryDelay)   
+        wait(Storage.AutoParryDelay)  
         Remotes:WaitForChild("ParryButtonPress"):Fire()
         Storage.AttemptedParry = true
     end
@@ -70,11 +70,12 @@ game:GetService("RunService").PostSimulation:Connect(function()
                 local DistanceToPlayer = (Player.Character.HumanoidRootPart.Position - OtherBall.Position).Magnitude
                 local EstimatedTimeToReachPlayer = (ServerPing / VelocityMagnitude) / (ServerPing / DistanceToPlayer)
                 local TimeToParry = 0.2 * (VelocityMagnitude / DistanceToPlayer)
+
  
                 Storage.ParryCooldown = math.max(0.1, EstimatedTimeToReachPlayer)
-
+ 
                 if tostring(EstimatedTimeToReachPlayer) ~= math.huge and TimeToParry < 12 then
-                    if EstimatedTimeToReachPlayer <= TimeToParry then
+                    if EstimatedTimeToReachPlayer <= TimeToParry * 0.9 then
                         autoParry()
                     else
                         Storage.AttemptedParry = false
@@ -88,6 +89,7 @@ game:GetService("RunService").PostSimulation:Connect(function()
     end
     Storage.LastTick = os.clock()
 end)
+
  
 game:GetService("RunService").Stepped:Connect(function()
     if Player.Character:FindFirstChild("Highlight") then
