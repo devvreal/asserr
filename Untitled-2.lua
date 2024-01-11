@@ -14,7 +14,7 @@ local Storage = {
     LastTick = os.clock(),
     LastBallPosition = nil,
     AttemptedParry = false,
-    ParryCooldown = 2,  -- Set the cooldown time in seconds
+    ParryCooldown = 2,  
 }
 
 local function GetBall()
@@ -44,11 +44,12 @@ local function debounce()
 end
 
 local parryDebouncer = debounce()
+local autoParryDebouncer = debounce()
 
+ 
 local function AutoParry()
-    if not Storage.AttemptedParry and parryDebouncer() then
+    if Player.Character:FindFirstChild("Highlight") and autoParryDebouncer() then
         Remotes:WaitForChild("ParryButtonPress"):Fire()
-        Storage.AttemptedParry = true
     end
 end
 
@@ -68,16 +69,15 @@ game:GetService("RunService").PostSimulation:Connect(function()
                 local EstimatedTimeToReachPlayer = (ServerPing / VelocityMagnitude) / (ServerPing / DistanceToPlayer)
                 local TimeToParry = 0.2 * (VelocityMagnitude / DistanceToPlayer)
 
-                -- Improve the timing calculation
-                local ClashWindow = 0.5  -- Set the clash window in seconds
-                local CurrentDistanceToPlayer = (Player.Character.HumanoidRootPart.Position - OtherBall.Position).Magnitude
-                local OptimalTimeToParry = CurrentDistanceToPlayer / VelocityMagnitude
-
-                if EstimatedTimeToReachPlayer > (OptimalTimeToParry - ClashWindow / 2) and
-                   EstimatedTimeToReachPlayer < (OptimalTimeToParry + ClashWindow / 2) then
-                    AutoParry()
-                else
-                    Storage.AttemptedParry = false
+                if tostring(EstimatedTimeToReachPlayer) ~= math.huge and TimeToParry < 12 then
+                    if EstimatedTimeToReachPlayer <= TimeToParry then
+                        if not Storage.AttemptedParry and parryDebouncer() then
+                            Remotes:WaitForChild("ParryButtonPress"):Fire()
+                            Storage.AttemptedParry = true
+                        end
+                    else
+                        Storage.AttemptedParry = false
+                    end
                 end
             else
                 Storage.AttemptedParry = false
@@ -86,4 +86,7 @@ game:GetService("RunService").PostSimulation:Connect(function()
         Storage.LastBallPosition = OtherBall.Position
     end
     Storage.LastTick = os.clock()
+
+ 
+    AutoParry()
 end)
