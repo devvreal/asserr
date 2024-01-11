@@ -15,7 +15,8 @@ local Storage = {
     LastBallPosition = nil,
     AttemptedParry = false,
     ParryCooldown = 0.5,   
-    AutoParryInterval = 0.1,   
+    AutoParryInterval = 0.1,  
+    AutoParryDelay = 1.0,   
 }
 
 local function GetBall()
@@ -48,6 +49,7 @@ local parryDebouncer = debounce()
 
 local function autoParry()
     if not Storage.AttemptedParry and parryDebouncer() then
+        wait(Storage.AutoParryDelay)   
         Remotes:WaitForChild("ParryButtonPress"):Fire()
         Storage.AttemptedParry = true
     end
