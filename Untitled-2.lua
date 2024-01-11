@@ -45,31 +45,40 @@ end
 
 local parryDebouncer = debounce()
 
+local function PredictedPosition(currentPosition, velocity, time)
+    local predictedPosition = currentPosition + velocity * time
+    return predictedPosition
+end
+
+local function AutoParry()
+    if not Storage.AttemptedParry and parryDebouncer() then
+        Remotes:WaitForChild("ParryButtonPress"):Fire()
+        Storage.AttemptedParry = true
+    end
+end
+
 game:GetService("RunService").PostSimulation:Connect(function()
     local RealBall, OtherBall = GetBall()
     if RealBall and OtherBall then
         if Storage.LastBallPosition then
             if Player.Character:FindFirstChild("Highlight") then
                 local DeltaT = os.clock() - Storage.LastTick
-                local VelocityX = (OtherBall.Position.X - Storage.LastBallPosition.X) / DeltaT
-                local VelocityY = (OtherBall.Position.Y - Storage.LastBallPosition.Y) / DeltaT
-                local VelocityZ = (OtherBall.Position.Z - Storage.LastBallPosition.Z) / DeltaT
-                local VelocityMagnitude = math.sqrt(VelocityX^2 + VelocityY^2 + VelocityZ^2)
+                local Velocity = (OtherBall.Position - Storage.LastBallPosition) / DeltaT
 
                 local ServerPing = StatsService.Network.ServerStatsItem["Data Ping"]:GetValue()
                 local DistanceToPlayer = (Player.Character.HumanoidRootPart.Position - OtherBall.Position).Magnitude
-                local EstimatedTimeToReachPlayer = (ServerPing / VelocityMagnitude) / (ServerPing / DistanceToPlayer)
-                local TimeToParry = 0.2 * (VelocityMagnitude / DistanceToPlayer)
+                local EstimatedTimeToReachPlayer = DistanceToPlayer / Velocity.magnitude
+                local TimeToParry = 0.2 * EstimatedTimeToReachPlayer
 
-                if tostring(EstimatedTimeToReachPlayer) ~= math.huge and TimeToParry < 12 then
-                    if EstimatedTimeToReachPlayer <= TimeToParry then
-                        if not Storage.AttemptedParry and parryDebouncer() then
-                            Remotes:WaitForChild("ParryButtonPress"):Fire()
-                            Storage.AttemptedParry = true
-                        end
-                    else
-                        Storage.AttemptedParry = false
-                    end
+                local FutureBallPosition = PredictedPosition(OtherBall.Position, Velocity, TimeToParry)
+
+                local DistanceToFuturePosition = (Player.Character.HumanoidRootPart.Position - FutureBallPosition).Magnitude
+                local TimeToFuturePosition = DistanceToFuturePosition / Velocity.magnitude
+
+                if TimeToParry <= TimeToFuturePosition then
+                    AutoParry()
+                else
+                    Storage.AttemptedParry = false
                 end
             else
                 Storage.AttemptedParry = false
