@@ -14,10 +14,11 @@ local Storage = {
     LastTick = os.clock(),
     LastBallPosition = nil,
     AttemptedParry = false,
-    ParryCooldown = 0.5, 
-    AutoParryInterval = 0.1,  
-    AutoParryDelay = 0.5,  
-    MaxAutoParryDistance = 15, 
+    ParryCooldown = 0.5,
+    AutoParryInterval = 0.1,
+    AutoParryDelay = 0.5,
+    MaxAutoParryDistance = 15,
+    MinVelocityMagnitude = 10,
 }
 
 local function GetBall()
@@ -34,7 +35,6 @@ end
 
 local function debounce()
     local lastTime = 0
-
     return function()
         local currentTime = os.clock()
         if currentTime - lastTime >= Storage.ParryCooldown then
@@ -50,7 +50,7 @@ local parryDebouncer = debounce()
 
 local function autoParry()
     if not Storage.AttemptedParry and parryDebouncer() then
-        wait(Storage.AutoParryDelay)  
+        wait(Storage.AutoParryDelay)
         Remotes:WaitForChild("ParryButtonPress"):Fire()
         Storage.AttemptedParry = true
     end
@@ -71,20 +71,21 @@ game:GetService("RunService").PostSimulation:Connect(function()
                 local DistanceToPlayer = (Player.Character.HumanoidRootPart.Position - OtherBall.Position).Magnitude
                 local EstimatedTimeToReachPlayer = (ServerPing / VelocityMagnitude) / (ServerPing / DistanceToPlayer)
                 local TimeToParry = 0.2 * (VelocityMagnitude / DistanceToPlayer)
- 
+
                 Storage.ParryCooldown = math.max(0.1, EstimatedTimeToReachPlayer)
 
- 
                 if tostring(EstimatedTimeToReachPlayer) ~= math.huge and TimeToParry < 12 then
                     local BallToPlayerVector = (Player.Character.HumanoidRootPart.Position - OtherBall.Position).Unit
                     local BallVelocityVector = Vector3.new(VelocityX, VelocityY, VelocityZ).Unit
 
                     local DotProduct = BallVelocityVector:Dot(BallToPlayerVector)
 
-                    if EstimatedTimeToReachPlayer <= TimeToParry * 0.9 or (DistanceToPlayer <= Storage.MaxAutoParryDistance and DotProduct > 0) then
-                        autoParry()
-                    else
-                        Storage.AttemptedParry = false
+                    if EstimatedTimeToReachPlayer <= TimeToParry * 0.9 and VelocityMagnitude >= Storage.MinVelocityMagnitude then
+                        if DistanceToPlayer <= Storage.MaxAutoParryDistance or (DotProduct > 0 and DistanceToPlayer <= Storage.MaxAutoParryDistance * 1.5) then
+                            autoParry()
+                        else
+                            Storage.AttemptedParry = false
+                        end
                     end
                 end
             else
@@ -95,7 +96,7 @@ game:GetService("RunService").PostSimulation:Connect(function()
     end
     Storage.LastTick = os.clock()
 end)
- 
+
 game:GetService("RunService").Stepped:Connect(function()
     if Player.Character:FindFirstChild("Highlight") then
         if not Storage.AutoParryTimer or (os.clock() - Storage.AutoParryTimer >= Storage.AutoParryInterval) then
