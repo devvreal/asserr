@@ -1,17 +1,20 @@
- local AutoParry = {}
-AutoParry.__index = AutoParry
-
-function AutoParry.new(player)
-    local self = setmetatable({}, AutoParry)
-    self.Player = player
-    self.Remotes = game:GetService("ReplicatedStorage"):WaitForChild("Remotes", 9e9)
-    self.LastTick = os.clock()
-    self.LastBallPosition = nil
-    self.AttemptedParry = false
-    return self
+local Cloneref = cloneref or function(Object)
+    return Object
 end
 
-function AutoParry:GetBall()
+local ReplicatedStorage = Cloneref(game:GetService("ReplicatedStorage"))
+local Players = Cloneref(game:GetService("Players"))
+local Player = Players.LocalPlayer
+local RunService = game:GetService("RunService")
+local Remotes = ReplicatedStorage:WaitForChild("Remotes", 9e9)
+
+local Storage = {
+    LastTick = os.clock(),
+    LastBallPosition = nil,
+    AttemptedParry = false,
+}
+
+local function GetBall()
     local RealBall, OtherBall = nil, nil
     for _, Object in pairs(workspace.Balls:GetChildren()) do
         if Object:GetAttribute("realBall") == true then
@@ -23,39 +26,43 @@ function AutoParry:GetBall()
     return RealBall, OtherBall
 end
 
-function AutoParry:PredictBallMovement()
-    local RealBall, OtherBall = self:GetBall()
+local function PredictBallPosition(ball, time)
+    local initialPosition = ball.Position
+    local velocity = ball.Velocity
+    return initialPosition + velocity * time
+end
+
+RunService.PostSimulation:Connect(function()
+    local RealBall, OtherBall = GetBall()
     if RealBall and OtherBall then
-        if self.LastBallPosition then
-            if self.Player.Character:FindFirstChild("Highlight") then
-                local DeltaT = os.clock() - self.LastTick
-                local Velocity = (OtherBall.Position - self.LastBallPosition) / DeltaT
+        if Storage.LastBallPosition then
+            if Player.Character:FindFirstChild("Highlight") then
+                local DeltaT = os.clock() - Storage.LastTick
+                local Velocity = (OtherBall.Position - Storage.LastBallPosition) / DeltaT
                 local VelocityMagnitude = Velocity.Magnitude
 
                 local ServerPing = game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValue()
-                local DistanceToPlayer = (self.Player.Character.HumanoidRootPart.Position - OtherBall.Position).Magnitude
+                local DistanceToPlayer = (Player.Character.HumanoidRootPart.Position - OtherBall.Position).Magnitude
                 local EstimatedTimeToReachPlayer = (ServerPing / VelocityMagnitude) * (DistanceToPlayer / VelocityMagnitude)
                 local TimeToParry = 0.2 * (VelocityMagnitude / DistanceToPlayer)
 
-                if not self.AttemptedParry and EstimatedTimeToReachPlayer <= TimeToParry then
-                    self.Remotes:WaitForChild("ParryButtonPress"):Fire()
-                    self.AttemptedParry = true
+                if not Storage.AttemptedParry and EstimatedTimeToReachPlayer <= TimeToParry then
+                    local PredictedPosition = PredictBallPosition(OtherBall, EstimatedTimeToReachPlayer)
+                    local PlayerPosition = Player.Character.HumanoidRootPart.Position
+                    local DistanceToPredictedPosition = (PlayerPosition - PredictedPosition).Magnitude
+
+                    if DistanceToPredictedPosition <= 15 then 
+                        Remotes:WaitForChild("ParryButtonPress"):Fire()
+                        Storage.AttemptedParry = true
+                    end
                 elseif EstimatedTimeToReachPlayer > TimeToParry then
-                    self.AttemptedParry = false
+                    Storage.AttemptedParry = false
                 end
             else
-                self.AttemptedParry = false
+                Storage.AttemptedParry = false
             end
         end
-        self.LastBallPosition = OtherBall.Position
+        Storage.LastBallPosition = OtherBall.Position
     end
-    self.LastTick = os.clock()
-end
-
--- Usage
-local player = game.Players.LocalPlayer
-local autoParry = AutoParry.new(player)
-
-game:GetService("RunService").PostSimulation:Connect(function()
-    autoParry:PredictBallMovement()
+    Storage.LastTick = os.clock()
 end)
