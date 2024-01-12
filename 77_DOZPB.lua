@@ -16,20 +16,29 @@ local Storage = {
     AttemptedParry = false,
 }
 
- 
-local function CalculateSpamFrequency(reactionTime)
-  
-    local baseFrequency = 5   
- 
-    local exponentialFactor = math.exp(reactionTime)
- 
-    local spamFrequency = baseFrequency * exponentialFactor
- 
-    spamFrequency = spamFrequency * math.random(1, 3)
- 
-    spamFrequency = math.clamp(spamFrequency, 1, 100)
+local CooldownTimer = 0
+local CooldownDuration = 2 
 
-    return spamFrequency
+local function GetBall()
+    local RealBall, OtherBall = nil, nil
+    for _, Object in pairs(workspace.Balls:GetChildren()) do
+        if Object:GetAttribute("realBall") == true then
+            RealBall = Object
+        else
+            OtherBall = Object
+        end
+    end
+    return RealBall, OtherBall
+end
+
+local function AutoSpam()
+    if not Storage.AttemptedParry and CooldownTimer <= 0 then
+  
+        Remotes:WaitForChild("SpamAction"):Fire()
+
+ 
+        CooldownTimer = CooldownDuration
+    end
 end
 
 game:service("RunService").PostSimulation:Connect(function()
@@ -46,16 +55,11 @@ game:service("RunService").PostSimulation:Connect(function()
                 local ServerPing = StatsService.Network.ServerStatsItem["Data Ping"]:GetValue()
                 local DistanceToPlayer = (Player.Character.HumanoidRootPart.Position - OtherBall.Position).Magnitude
                 local EstimatedTimeToReachPlayer = (ServerPing / VelocityMagnitude) / (ServerPing / DistanceToPlayer)
-                local TimeToParry = 0.2 * (VelocityMagnitude / DistanceToPlayer)
+                local TimeToParry = 0.5 * (VelocityMagnitude / DistanceToPlayer) -- Adjusted multiplier
 
                 if tostring(EstimatedTimeToReachPlayer) ~= math.huge and TimeToParry < 12 then
                     if EstimatedTimeToReachPlayer <= TimeToParry then
-                        if not Storage.AttemptedParry then 
-                            for _ = 1, CalculateSpamFrequency(EstimatedTimeToReachPlayer) do
-                                Remotes:WaitForChild("ParryButtonPress"):Fire()
-                            end
-                            Storage.AttemptedParry = true
-                        end
+                        AutoSpam()
                     else
                         Storage.AttemptedParry = false
                     end
@@ -67,4 +71,5 @@ game:service("RunService").PostSimulation:Connect(function()
         Storage.LastBallPosition = OtherBall.Position
     end
     Storage.LastTick = os.clock()
+    CooldownTimer = math.max(0, CooldownTimer - DeltaT)
 end)
