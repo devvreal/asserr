@@ -2,16 +2,19 @@ local Cloneref = cloneref or function(Object)
     return Object
 end
 
+local StatsService = Cloneref(game:GetService("Stats"))
+local UserInputService = Cloneref(game:GetService("UserInputService"))
 local ReplicatedStorage = Cloneref(game:GetService("ReplicatedStorage"))
 local Players = Cloneref(game:GetService("Players"))
 local Player = Players.LocalPlayer
-local RunService = game:GetService("RunService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Remotes = ReplicatedStorage:WaitForChild("Remotes", 9e9)
 
 local Storage = {
     LastTick = os.clock(),
     LastBallPosition = nil,
     AttemptedParry = false,
+    Cooldown = false,
 }
 
 local function GetBall()
@@ -26,40 +29,34 @@ local function GetBall()
     return RealBall, OtherBall
 end
 
-local function PredictBallPosition(ball, time)
-    local initialPosition = ball.Position
-    local velocity = ball.Velocity
-    return initialPosition + velocity * time
-end
-
-RunService.PostSimulation:Connect(function()
+game:GetService("RunService").PostSimulation:Connect(function()
     local RealBall, OtherBall = GetBall()
     if RealBall and OtherBall then
         if Storage.LastBallPosition then
             if Player.Character:FindFirstChild("Highlight") then
                 local DeltaT = os.clock() - Storage.LastTick
-                local Velocity = (OtherBall.Position - Storage.LastBallPosition) / DeltaT
-                local VelocityMagnitude = Velocity.Magnitude
+                local VelocityX = (OtherBall.Position.X - Storage.LastBallPosition.X) / DeltaT
+                local VelocityY = (OtherBall.Position.Y - Storage.LastBallPosition.Y) / DeltaT
+                local VelocityZ = (OtherBall.Position.Z - Storage.LastBallPosition.Z) / DeltaT
+                local VelocityMagnitude = math.sqrt(VelocityX^2 + VelocityY^2 + VelocityZ^2)
 
-                local ServerPing = game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValue()
+                local ServerPing = StatsService.Network.ServerStatsItem["Data Ping"]:GetValue()
                 local DistanceToPlayer = (Player.Character.HumanoidRootPart.Position - OtherBall.Position).Magnitude
-                local EstimatedTimeToReachPlayer = (ServerPing / VelocityMagnitude) * (DistanceToPlayer / VelocityMagnitude)
+                local EstimatedTimeToReachPlayer = (ServerPing / VelocityMagnitude) / (ServerPing / DistanceToPlayer)
                 local TimeToParry = 0.2 * (VelocityMagnitude / DistanceToPlayer)
 
-                if not Storage.AttemptedParry and EstimatedTimeToReachPlayer <= TimeToParry then
-                    local PredictedPosition = PredictBallPosition(OtherBall, EstimatedTimeToReachPlayer)
-                    local PlayerPosition = Player.Character.HumanoidRootPart.Position
-                    local DistanceToPredictedPosition = (PlayerPosition - PredictedPosition).Magnitude
+                if EstimatedTimeToReachPlayer <= TimeToParry and not Storage.AttemptedParry and not Storage.Cooldown then
+                    Remotes:WaitForChild("ParryButtonPress"):Fire()
+                    Storage.AttemptedParry = true
+                    Storage.Cooldown = true
 
-                    if DistanceToPredictedPosition <= 15 then 
-                        Remotes:WaitForChild("ParryButtonPress"):Fire()
-                        Storage.AttemptedParry = true
-                    end
-                elseif EstimatedTimeToReachPlayer > TimeToParry then
-                    Storage.AttemptedParry = false
+   
+                    print("Auto Parry Successful!")
+
+ 
+                    wait(2)
+                    Storage.Cooldown = false
                 end
-            else
-                Storage.AttemptedParry = false
             end
         end
         Storage.LastBallPosition = OtherBall.Position
