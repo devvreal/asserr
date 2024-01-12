@@ -33,11 +33,11 @@ local function GetBall()
     return RealBall, OtherBall
 end
 
-local function debounce()
+local function debounce(cooldown)
     local lastTime = 0
     return function()
         local currentTime = os.clock()
-        if currentTime - lastTime >= Storage.ParryCooldown then
+        if currentTime - lastTime >= cooldown then
             lastTime = currentTime
             return true
         else
@@ -46,7 +46,8 @@ local function debounce()
     end
 end
 
-local parryDebouncer = debounce()
+local parryDebouncer = debounce(Storage.ParryCooldown)
+local autoParryDebouncer = debounce(Storage.AutoParryInterval)
 
 local function autoParry()
     if not Storage.AttemptedParry and parryDebouncer() then
@@ -74,7 +75,7 @@ game:GetService("RunService").PostSimulation:Connect(function()
 
                 Storage.ParryCooldown = math.max(0.1, EstimatedTimeToReachPlayer)
 
-                if tostring(EstimatedTimeToReachPlayer) ~= math.huge and TimeToParry < 12 then
+                if EstimatedTimeToReachPlayer ~= math.huge and TimeToParry < 12 then
                     local BallToPlayerVector = (Player.Character.HumanoidRootPart.Position - OtherBall.Position).Unit
                     local BallVelocityVector = Vector3.new(VelocityX, VelocityY, VelocityZ).Unit
 
@@ -99,7 +100,7 @@ end)
 
 game:GetService("RunService").Stepped:Connect(function()
     if Player.Character:FindFirstChild("Highlight") then
-        if not Storage.AutoParryTimer or (os.clock() - Storage.AutoParryTimer >= Storage.AutoParryInterval) then
+        if not Storage.AutoParryTimer or (os.clock() - Storage.AutoParryTimer >= Storage.AutoParryInterval and autoParryDebouncer()) then
             autoParry()
             Storage.AutoParryTimer = os.clock()
         end
