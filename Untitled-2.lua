@@ -1,5 +1,4 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/wizard"))()
-
 local PhantomForcesWindow = Library:NewWindow("Noxine")
 
 local KillingCheats = PhantomForcesWindow:NewSection("Official")
@@ -11,15 +10,15 @@ local AutoParryButton = KillingCheats:CreateButton("Auto Parry", function()
     local Local = Players.LocalPlayer
     local Camera = workspace.CurrentCamera
     local Balls = workspace:WaitForChild("Balls")
-
-    getgenv().Signal = getgenv().Signal or {}
+    
+    getgenv().Signal = Signal or {}
 
     function PlayerPoints()
         local tbl = {}
-        for _, v in pairs(Players:GetPlayers()) do
-            local HumanoidRootPart = v.Character and v.Character:FindFirstChild("HumanoidRootPart")
+        for i, v in pairs(Players:GetPlayers()) do
+            local UserId, HumanoidRootPart = tostring(v.UserId), v.Character and v.Character:FindFirstChild("HumanoidRootPart")
             if HumanoidRootPart and v == Local then
-                tbl[tostring(v.UserId)] = Camera:WorldToScreenPoint(HumanoidRootPart.Position)
+                tbl[UserId] = Camera:WorldToScreenPoint(HumanoidRootPart.Position)
             end
         end
         return tbl
@@ -38,7 +37,6 @@ local AutoParryButton = KillingCheats:CreateButton("Auto Parry", function()
                     [2] = WorldToScreenPoint.Y
                 }
             }
-
             Remote:FireServer(unpack(args))
         end
     end
@@ -46,14 +44,14 @@ local AutoParryButton = KillingCheats:CreateButton("Auto Parry", function()
     local Debounce, LastTime = false
 
     function Anticipate(Time)
-        if Debounce then return end
+        if Debounce then
+            return
+        end
 
         if LastTime then
             local Sum = (Time - LastTime)
-            if (Sum >= -25 and Sum <= 25) then
-                if Sum >= 25 or Sum <= -25 then
-                    return true
-                end
+            if math.abs(Sum) >= 25 then
+                return true
             end
         end
 
@@ -73,26 +71,19 @@ local AutoParryButton = KillingCheats:CreateButton("Auto Parry", function()
     function canObjectParry(projectilePosition, objectPosition, projectileVelocity, objectVelocity)
         local timeToIntercept = calculateProjectileTime(projectilePosition, objectPosition, projectileVelocity)
         local distanceToIntercept = calculateDistance(projectilePosition + projectileVelocity * timeToIntercept, objectPosition + objectVelocity * timeToIntercept)
-        local AnticipateValue = Anticipate(timeToIntercept)
+        local AnticipateResult = Anticipate(timeToIntercept)
 
         local conditions = {
-            (AnticipateValue and distanceToIntercept <= 75),
-            (distanceToIntercept >= 35 and distanceToIntercept <= 50 and timeToIntercept <= 0.6),
-            (distanceToIntercept >= 50 and distanceToIntercept <= 75 and timeToIntercept >= 0.6 and timeToIntercept <= 0.75),
-            (distanceToIntercept <= 35 and timeToIntercept <= 0.5),
-            (distanceToIntercept <= 12.5 and timeToIntercept >= 0.5 and timeToIntercept <= 0.75),
-            (distanceToIntercept <= 0.025 and timeToIntercept <= 0.75),
-            (distanceToIntercept >= 75 and distanceToIntercept <= 100 and timeToIntercept <= 0.5)
+            AnticipateResult and distanceToIntercept <= 75,
+            distanceToIntercept >= 35 and distanceToIntercept <= 50 and timeToIntercept <= 0.6,
+            distanceToIntercept >= 50 and distanceToIntercept <= 75 and timeToIntercept >= 0.6 and timeToIntercept <= 0.75,
+            distanceToIntercept <= 35 and timeToIntercept <= 0.5,
+            distanceToIntercept <= 12.5 and timeToIntercept >= 0.5 and timeToIntercept <= 0.75,
+            distanceToIntercept <= 0.025 and timeToIntercept <= 0.75,
+            distanceToIntercept >= 75 and distanceToIntercept <= 100 and timeToIntercept <= 0.5
         }
 
-        local r
-        for _, condition in pairs(conditions) do
-            if condition then
-                r = true
-            end
-        end
-
-        return r
+        return conditions
     end
 
     function chooseNewFocusedBall()
@@ -104,22 +95,23 @@ local AutoParryButton = KillingCheats:CreateButton("Auto Parry", function()
                 return ball
             end
         end
+
+        return nil
     end
 
     function foreach(Ball)
-        local focusedBall = chooseNewFocusedBall()
-        if (focusedBall) and not Debounce then
-            for _, v in pairs(getgenv().Signal) do
-                table.remove(getgenv().Signal, _)
+        local Ball = chooseNewFocusedBall()
+        if Ball and not Debounce then
+            for i, v in pairs(Signal) do
+                table.remove(Signal, i)
                 v:Disconnect()
             end
-
             local function Calculation(Delta)
                 local Start, HumanoidRootPart = os.clock(), Local.Character and Local.Character:FindFirstChild("HumanoidRootPart")
-                if (focusedBall and focusedBall:FindFirstChild("zoomies") and focusedBall:GetAttribute("target") == Local.Name) and HumanoidRootPart and not Debounce then
-                    local timeToReachTarget = calculateProjectileTime(focusedBall.Position, HumanoidRootPart.Position, focusedBall.Velocity)
-                    local distanceToTarget = calculateDistance(focusedBall.Position, HumanoidRootPart.Position)
-                    local canParry = canObjectParry(focusedBall.Position, HumanoidRootPart.Position, focusedBall.Velocity, HumanoidRootPart.Velocity)
+                if Ball and Ball:FindFirstChild("zoomies") and Ball:GetAttribute("target") == Local.Name and HumanoidRootPart and not Debounce then
+                    local timeToReachTarget = calculateProjectileTime(Ball.Position, HumanoidRootPart.Position, Ball.Velocity)
+                    local distanceToTarget = calculateDistance(Ball.Position, HumanoidRootPart.Position)
+                    local canParry = canObjectParry(Ball.Position, HumanoidRootPart.Position, Ball.Velocity, HumanoidRootPart.Velocity)
 
                     if canParry then
                         Parry()
@@ -127,7 +119,7 @@ local AutoParryButton = KillingCheats:CreateButton("Auto Parry", function()
                         Debounce = true
                         local Signal = nil
                         Signal = RunService.Stepped:Connect(function()
-                            if focusedBall:GetAttribute("target") ~= Local.Name or os.clock() - Start >= 1.25 or not focusedBall or not workspace.Alive:FindFirstChild(Local.Name) then
+                            if Ball:GetAttribute("target") ~= Local.Name or os.clock() - Start >= 1.25 or not Ball or not workspace.Alive:FindFirstChild(Local.Name) then
                                 Debounce = false
                                 Signal:Disconnect()
                             end
@@ -135,8 +127,7 @@ local AutoParryButton = KillingCheats:CreateButton("Auto Parry", function()
                     end
                 end
             end
-
-            getgenv().Signal[#getgenv().Signal + 1] = RunService.Stepped:Connect(Calculation)
+            Signal[#Signal + 1] = RunService.Stepped:Connect(Calculation)
         end
     end
 
@@ -145,8 +136,8 @@ local AutoParryButton = KillingCheats:CreateButton("Auto Parry", function()
     function Init()
         Balls.ChildAdded:Connect(foreach)
 
-        for _, ball in pairs(Balls:GetChildren()) do
-            foreach(ball)
+        for i, v in pairs(Balls:GetChildren()) do
+            foreach(v)
         end
     end
 
@@ -229,8 +220,10 @@ local AutoSpamButton = KillingCheats:CreateButton("Auto Spam", function()
 
     local function DetectSpam()
         local Balls = workspace:WaitForChild("Balls", 20)
+
         local OldPos = Vector3.new()
         local OldTick1 = tick()
+
         local OldBall = Balls
         local TargetPlayer = ""
         local SpamNum = 0
@@ -337,6 +330,6 @@ local DeleteClashButton = KillingCheats:CreateButton("Delete Clash", function()
     end)
 end)
 
-local DiscordServerButton = KillingCheats:CreateButton("Discord Server", function()
+KillingCheats:CreateButton("Discord Server", function()
     setclipboard("https://discord.gg/nyWZdufrK6")
 end)
