@@ -1,27 +1,30 @@
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/wizard"))()
+local Library = loadstring(Game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/wizard"))()
 
 local PhantomForcesWindow = Library:NewWindow("Noxine")
 
 local KillingCheats = PhantomForcesWindow:NewSection("Official")
 
-local AutoParryButton = KillingCheats:CreateButton("Auto Parry", function()
-    local workspace = game:GetService("Workspace")
+KillingCheats:CreateButton("Auto Parry", function()
+local workspace = game:GetService("Workspace")
     local RunService = game:GetService("RunService")
+
     local Players = game:GetService("Players")
     local Local = Players.LocalPlayer
+
     local Camera = workspace.CurrentCamera
     local Balls = workspace:WaitForChild("Balls")
 
-    getgenv().Signal = getgenv().Signal or {}
+    getgenv().Signal = Signal or {}
 
     function PlayerPoints()
         local tbl = {}
-        for _, v in pairs(Players:GetPlayers()) do
-            local HumanoidRootPart = v.Character and v.Character:FindFirstChild("HumanoidRootPart")
+        for i, v in pairs(Players:GetPlayers()) do
+            local UserId, HumanoidRootPart = tostring(v.UserId), v.Character and v.Character:FindFirstChild("HumanoidRootPart")
             if HumanoidRootPart and v == Local then
-                tbl[tostring(v.UserId)] = Camera:WorldToScreenPoint(HumanoidRootPart.Position)
+                tbl[UserId] = Camera:WorldToScreenPoint(HumanoidRootPart.Position)
             end
         end
+
         return tbl
     end
 
@@ -73,10 +76,10 @@ local AutoParryButton = KillingCheats:CreateButton("Auto Parry", function()
     function canObjectParry(projectilePosition, objectPosition, projectileVelocity, objectVelocity)
         local timeToIntercept = calculateProjectileTime(projectilePosition, objectPosition, projectileVelocity)
         local distanceToIntercept = calculateDistance(projectilePosition + projectileVelocity * timeToIntercept, objectPosition + objectVelocity * timeToIntercept)
-        local AnticipateValue = Anticipate(timeToIntercept)
+        local Anticipate = Anticipate(timeToIntercept)
 
         local conditions = {
-            (AnticipateValue and distanceToIntercept <= 75),
+            (Anticipate and distanceToIntercept <= 75),
             (distanceToIntercept >= 35 and distanceToIntercept <= 50 and timeToIntercept <= 0.6),
             (distanceToIntercept >= 50 and distanceToIntercept <= 75 and timeToIntercept >= 0.6 and timeToIntercept <= 0.75),
             (distanceToIntercept <= 35 and timeToIntercept <= 0.5),
@@ -86,40 +89,40 @@ local AutoParryButton = KillingCheats:CreateButton("Auto Parry", function()
         }
 
         local r
-        for _, condition in pairs(conditions) do
-            if condition then
+        for i, v in pairs(conditions) do
+            if v == true then
                 r = true
             end
         end
 
-        return r
+        if r then return true end
     end
 
     function chooseNewFocusedBall()
         local balls = Balls:GetChildren()
         for _, ball in ipairs(balls) do
             if ball:GetAttribute("realBall") ~= nil and ball:GetAttribute("realBall") == true then
-                return ball
+                focusedBall = ball
+                break
             elseif ball:GetAttribute("target") ~= nil then
-                return ball
+                focusedBall = ball
+                break
             end
         end
+
+        return focusedBall
     end
 
     function foreach(Ball)
-        local focusedBall = chooseNewFocusedBall()
-        if (focusedBall) and not Debounce then
-            for _, v in pairs(getgenv().Signal) do
-                table.remove(getgenv().Signal, _)
-                v:Disconnect()
-            end
-
+        local Ball = chooseNewFocusedBall()
+        if (Ball) and not Debounce then
+            for i, v in pairs(Signal) do table.remove(Signal, i); v:Disconnect() end
             local function Calculation(Delta)
                 local Start, HumanoidRootPart = os.clock(), Local.Character and Local.Character:FindFirstChild("HumanoidRootPart")
-                if (focusedBall and focusedBall:FindFirstChild("zoomies") and focusedBall:GetAttribute("target") == Local.Name) and HumanoidRootPart and not Debounce then
-                    local timeToReachTarget = calculateProjectileTime(focusedBall.Position, HumanoidRootPart.Position, focusedBall.Velocity)
-                    local distanceToTarget = calculateDistance(focusedBall.Position, HumanoidRootPart.Position)
-                    local canParry = canObjectParry(focusedBall.Position, HumanoidRootPart.Position, focusedBall.Velocity, HumanoidRootPart.Velocity)
+                if (Ball and Ball:FindFirstChild("zoomies") and Ball:GetAttribute("target") == Local.Name) and HumanoidRootPart and not Debounce then
+                    local timeToReachTarget = calculateProjectileTime(Ball.Position, HumanoidRootPart.Position, Ball.Velocity)
+                    local distanceToTarget = calculateDistance(Ball.Position, HumanoidRootPart.Position)
+                    local canParry = canObjectParry(Ball.Position, HumanoidRootPart.Position, Ball.Velocity, HumanoidRootPart.Velocity)
 
                     if canParry then
                         Parry()
@@ -127,7 +130,7 @@ local AutoParryButton = KillingCheats:CreateButton("Auto Parry", function()
                         Debounce = true
                         local Signal = nil
                         Signal = RunService.Stepped:Connect(function()
-                            if focusedBall:GetAttribute("target") ~= Local.Name or os.clock() - Start >= 1.25 or not focusedBall or not workspace.Alive:FindFirstChild(Local.Name) then
+                            if Ball:GetAttribute("target") ~= Local.Name or os.clock()-Start >= 1.25 or not Ball or not workspace.Alive:FindFirstChild(Local.Name) then
                                 Debounce = false
                                 Signal:Disconnect()
                             end
@@ -135,8 +138,7 @@ local AutoParryButton = KillingCheats:CreateButton("Auto Parry", function()
                     end
                 end
             end
-
-            getgenv().Signal[#getgenv().Signal + 1] = RunService.Stepped:Connect(Calculation)
+            Signal[#Signal+1] = RunService.Stepped:Connect(Calculation)
         end
     end
 
@@ -145,16 +147,16 @@ local AutoParryButton = KillingCheats:CreateButton("Auto Parry", function()
     function Init()
         Balls.ChildAdded:Connect(foreach)
 
-        for _, ball in pairs(Balls:GetChildren()) do
-            foreach(ball)
+        for i, v in pairs(Balls:GetChildren()) do
+            foreach(v)
         end
     end
 
     Init()
 end)
 
-local AutoSpamButton = KillingCheats:CreateButton("Auto Spam", function()
-    local function get_plr()
+KillingCheats:CreateButton("Auto Spam", function()
+local function get_plr()
         return game.Players.LocalPlayer
     end
 
@@ -213,7 +215,7 @@ local AutoSpamButton = KillingCheats:CreateButton("Auto Spam", function()
                         [4] = { [1] = 910, [2] = 154 }
                     }
                     game:GetService("ReplicatedStorage").Remotes.ParryAttempt:FireServer(unpack(args))
-                    task.wait(0.1)
+                    task.wait(0.1)  
                 end
             end
         end)
@@ -229,8 +231,10 @@ local AutoSpamButton = KillingCheats:CreateButton("Auto Spam", function()
 
     local function DetectSpam()
         local Balls = workspace:WaitForChild("Balls", 20)
+
         local OldPos = Vector3.new()
         local OldTick1 = tick()
+
         local OldBall = Balls
         local TargetPlayer = ""
         local SpamNum = 0
@@ -317,26 +321,28 @@ local AutoSpamButton = KillingCheats:CreateButton("Auto Spam", function()
     DetectSpam()
 end)
 
-local DeleteClashButton = KillingCheats:CreateButton("Delete Clash", function()
-    local RunService = game:GetService("RunService")
+KillingCheats:CreateButton("Delete Clash", function()
+local RunService = game:GetService("RunService")
 
-    local function removeParticleEmitters(object)
-        for _, descendant in pairs(object:GetDescendants()) do
-            if descendant:IsA("ParticleEmitter") then
-                descendant:Destroy()
-            end
+local function removeParticleEmitters(object)
+    for _, descendant in pairs(object:GetDescendants()) do
+        if descendant:IsA("ParticleEmitter") then
+            descendant:Destroy()
         end
     end
+end
 
-    local function onRepeatRemoval()
-        removeParticleEmitters(workspace)
-    end
+local function onRepeatRemoval()
+    removeParticleEmitters(workspace)
+end
 
-    RunService.Heartbeat:Connect(function(deltaTime)
-        onRepeatRemoval()
-    end)
+RunService.Heartbeat:Connect(function(deltaTime)
+    onRepeatRemoval()
+end)
 end)
 
-local DiscordServerButton = KillingCheats:CreateButton("Discord Server", function()
-    setclipboard("https://discord.gg/nyWZdufrK6")
+KillingCheats:CreateButton("Discord Server", function()
+setclipboard("https://discord.gg/nyWZdufrK6")
 end)
+
+
