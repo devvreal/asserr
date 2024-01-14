@@ -3,14 +3,16 @@ local PhantomForcesWindow = Library:NewWindow("Noxine")
 
 local KillingCheats = PhantomForcesWindow:NewSection("Official")
 
-local AutoParryButton = KillingCheats:CreateButton("Auto Parry", function()
+KillingCheats:CreateButton("Auto Parry", function()
     local workspace = game:GetService("Workspace")
     local RunService = game:GetService("RunService")
+
     local Players = game:GetService("Players")
     local Local = Players.LocalPlayer
+
     local Camera = workspace.CurrentCamera
     local Balls = workspace:WaitForChild("Balls")
-    
+
     getgenv().Signal = Signal or {}
 
     function PlayerPoints()
@@ -21,6 +23,7 @@ local AutoParryButton = KillingCheats:CreateButton("Auto Parry", function()
                 tbl[UserId] = Camera:WorldToScreenPoint(HumanoidRootPart.Position)
             end
         end
+
         return tbl
     end
 
@@ -37,6 +40,7 @@ local AutoParryButton = KillingCheats:CreateButton("Auto Parry", function()
                     [2] = WorldToScreenPoint.Y
                 }
             }
+
             Remote:FireServer(unpack(args))
         end
     end
@@ -44,14 +48,14 @@ local AutoParryButton = KillingCheats:CreateButton("Auto Parry", function()
     local Debounce, LastTime = false
 
     function Anticipate(Time)
-        if Debounce then
-            return
-        end
+        if Debounce then return end
 
         if LastTime then
             local Sum = (Time - LastTime)
-            if math.abs(Sum) >= 25 then
-                return true
+            if (Sum >= -25 and Sum <= 25) then
+                if Sum >= 25 or Sum <= -25 then
+                    return true
+                end
             end
         end
 
@@ -71,44 +75,50 @@ local AutoParryButton = KillingCheats:CreateButton("Auto Parry", function()
     function canObjectParry(projectilePosition, objectPosition, projectileVelocity, objectVelocity)
         local timeToIntercept = calculateProjectileTime(projectilePosition, objectPosition, projectileVelocity)
         local distanceToIntercept = calculateDistance(projectilePosition + projectileVelocity * timeToIntercept, objectPosition + objectVelocity * timeToIntercept)
-        local AnticipateResult = Anticipate(timeToIntercept)
+        local Anticipate = Anticipate(timeToIntercept)
 
         local conditions = {
-            AnticipateResult and distanceToIntercept <= 75,
-            distanceToIntercept >= 35 and distanceToIntercept <= 50 and timeToIntercept <= 0.6,
-            distanceToIntercept >= 50 and distanceToIntercept <= 75 and timeToIntercept >= 0.6 and timeToIntercept <= 0.75,
-            distanceToIntercept <= 35 and timeToIntercept <= 0.5,
-            distanceToIntercept <= 12.5 and timeToIntercept >= 0.5 and timeToIntercept <= 0.75,
-            distanceToIntercept <= 0.025 and timeToIntercept <= 0.75,
-            distanceToIntercept >= 75 and distanceToIntercept <= 100 and timeToIntercept <= 0.5
+            (Anticipate and distanceToIntercept <= 75),
+            (distanceToIntercept >= 35 and distanceToIntercept <= 50 and timeToIntercept <= 0.6),
+            (distanceToIntercept >= 50 and distanceToIntercept <= 75 and timeToIntercept >= 0.6 and timeToIntercept <= 0.75),
+            (distanceToIntercept <= 35 and timeToIntercept <= 0.5),
+            (distanceToIntercept <= 12.5 and timeToIntercept >= 0.5 and timeToIntercept <= 0.75),
+            (distanceToIntercept <= 0.025 and timeToIntercept <= 0.75),
+            (distanceToIntercept >= 75 and distanceToIntercept <= 100 and timeToIntercept <= 0.5)
         }
 
-        return conditions
+        local r
+        for i, v in pairs(conditions) do
+            if v == true then
+                r = true
+            end
+        end
+
+        if r then return true end
     end
 
     function chooseNewFocusedBall()
         local balls = Balls:GetChildren()
         for _, ball in ipairs(balls) do
             if ball:GetAttribute("realBall") ~= nil and ball:GetAttribute("realBall") == true then
-                return ball
+                focusedBall = ball
+                break
             elseif ball:GetAttribute("target") ~= nil then
-                return ball
+                focusedBall = ball
+                break
             end
         end
 
-        return nil
+        return focusedBall
     end
 
     function foreach(Ball)
         local Ball = chooseNewFocusedBall()
-        if Ball and not Debounce then
-            for i, v in pairs(Signal) do
-                table.remove(Signal, i)
-                v:Disconnect()
-            end
+        if (Ball) and not Debounce then
+            for i, v in pairs(Signal) do table.remove(Signal, i); v:Disconnect() end
             local function Calculation(Delta)
                 local Start, HumanoidRootPart = os.clock(), Local.Character and Local.Character:FindFirstChild("HumanoidRootPart")
-                if Ball and Ball:FindFirstChild("zoomies") and Ball:GetAttribute("target") == Local.Name and HumanoidRootPart and not Debounce then
+                if (Ball and Ball:FindFirstChild("zoomies") and Ball:GetAttribute("target") == Local.Name) and HumanoidRootPart and not Debounce then
                     local timeToReachTarget = calculateProjectileTime(Ball.Position, HumanoidRootPart.Position, Ball.Velocity)
                     local distanceToTarget = calculateDistance(Ball.Position, HumanoidRootPart.Position)
                     local canParry = canObjectParry(Ball.Position, HumanoidRootPart.Position, Ball.Velocity, HumanoidRootPart.Velocity)
@@ -119,7 +129,7 @@ local AutoParryButton = KillingCheats:CreateButton("Auto Parry", function()
                         Debounce = true
                         local Signal = nil
                         Signal = RunService.Stepped:Connect(function()
-                            if Ball:GetAttribute("target") ~= Local.Name or os.clock() - Start >= 1.25 or not Ball or not workspace.Alive:FindFirstChild(Local.Name) then
+                            if Ball:GetAttribute("target") ~= Local.Name or os.clock()-Start >= 1.25 or not Ball or not workspace.Alive:FindFirstChild(Local.Name) then
                                 Debounce = false
                                 Signal:Disconnect()
                             end
@@ -127,7 +137,7 @@ local AutoParryButton = KillingCheats:CreateButton("Auto Parry", function()
                     end
                 end
             end
-            Signal[#Signal + 1] = RunService.Stepped:Connect(Calculation)
+            Signal[#Signal+1] = RunService.Stepped:Connect(Calculation)
         end
     end
 
@@ -144,7 +154,7 @@ local AutoParryButton = KillingCheats:CreateButton("Auto Parry", function()
     Init()
 end)
 
-local AutoSpamButton = KillingCheats:CreateButton("Auto Spam", function()
+KillingCheats:CreateButton("Auto Spam", function()
     local function get_plr()
         return game.Players.LocalPlayer
     end
@@ -298,8 +308,7 @@ local AutoSpamButton = KillingCheats:CreateButton("Auto Spam", function()
                             end
                         else
                             getgenv().SpamClickA = false
-                        end
-                    end
+                        end 
                 end)
                 OldBall = Ball
             end
@@ -310,7 +319,7 @@ local AutoSpamButton = KillingCheats:CreateButton("Auto Spam", function()
     DetectSpam()
 end)
 
-local DeleteClashButton = KillingCheats:CreateButton("Delete Clash", function()
+KillingCheats:CreateButton("Delete Clash", function()
     local RunService = game:GetService("RunService")
 
     local function removeParticleEmitters(object)
