@@ -1,7 +1,4 @@
-To enhance the Auto Parry feature and improve the Auto Spam function, we can add some adjustments to the existing code. Here's an updated version:
-
-    ```lua
-    local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/wizard"))()
+ local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/wizard"))()
     local PhantomForcesWindow = Library:NewWindow("Noxine")
     
     local KillingCheats = PhantomForcesWindow:NewSection("Official")
