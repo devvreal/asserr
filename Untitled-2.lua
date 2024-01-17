@@ -1,4 +1,7 @@
+-- Gui to Lua
+-- Version: 3.2
 
+-- Instances:
 
 local HackerHubNew = Instance.new("ScreenGui")
 local MainFrame = Instance.new("ImageButton")
@@ -1042,7 +1045,7 @@ Scriptscredits.TextWrapped = true
 
 -- Scripts:
 
-local function PPZZAFF_fake_script() -- GamesButton.LocalScript 
+local function BMFHST_fake_script() -- GamesButton.LocalScript 
 	local script = Instance.new('LocalScript', GamesButton)
 
 	script.Parent.MouseEnter:Connect(function()
@@ -1058,8 +1061,8 @@ local function PPZZAFF_fake_script() -- GamesButton.LocalScript
 		}):Play()
 	end)
 end
-coroutine.wrap(PPZZAFF_fake_script)()
-local function KIUPT_fake_script() -- GamesButton_2.LocalScript 
+coroutine.wrap(BMFHST_fake_script)()
+local function YPRN_fake_script() -- GamesButton_2.LocalScript 
 	local script = Instance.new('LocalScript', GamesButton_2)
 
 	script.Parent.MouseEnter:Connect(function()
@@ -1075,8 +1078,8 @@ local function KIUPT_fake_script() -- GamesButton_2.LocalScript
 		}):Play()
 	end)
 end
-coroutine.wrap(KIUPT_fake_script)()
-local function ZJWJ_fake_script() -- Main.LocalScript 
+coroutine.wrap(YPRN_fake_script)()
+local function ZOKCHD_fake_script() -- Main.LocalScript 
 	local script = Instance.new('LocalScript', Main)
 
 	script.Parent.MouseEnter:Connect(function()
@@ -1092,8 +1095,8 @@ local function ZJWJ_fake_script() -- Main.LocalScript
 		}):Play()
 	end)
 end
-coroutine.wrap(ZJWJ_fake_script)()
-local function IBIVU_fake_script() -- Main.LocalScript 
+coroutine.wrap(ZOKCHD_fake_script)()
+local function MZDGD_fake_script() -- Main.LocalScript 
 	local script = Instance.new('LocalScript', Main)
 
 	script.Parent.MouseButton1Click:Connect(function()
@@ -1104,20 +1107,20 @@ local function IBIVU_fake_script() -- Main.LocalScript
 		
 	end)
 end
-coroutine.wrap(IBIVU_fake_script)()
-local function MHNLTA_fake_script() -- Tag.LocalScript 
+coroutine.wrap(MZDGD_fake_script)()
+local function YCPXKVK_fake_script() -- Tag.LocalScript 
 	local script = Instance.new('LocalScript', Tag)
 
 	script.Parent.Text = "#".. math.random(7928) .." "
 end
-coroutine.wrap(MHNLTA_fake_script)()
-local function EKPZ_fake_script() -- Folder.LocalScript 
+coroutine.wrap(YCPXKVK_fake_script)()
+local function NJTYVK_fake_script() -- Folder.LocalScript 
 	local script = Instance.new('LocalScript', Folder)
 
 	script.Parent.Text = "".. game.Players.LocalPlayer.Name .." "
 end
-coroutine.wrap(EKPZ_fake_script)()
-local function XWEEIG_fake_script() -- DiscordIcon.LocalScript 
+coroutine.wrap(NJTYVK_fake_script)()
+local function XNZZ_fake_script() -- DiscordIcon.LocalScript 
 	local script = Instance.new('LocalScript', DiscordIcon)
 
 	local Players = game:GetService("Players")
@@ -1132,8 +1135,8 @@ local function XWEEIG_fake_script() -- DiscordIcon.LocalScript
 	local imageLabel = script.Parent
 	imageLabel.Image = content
 end
-coroutine.wrap(XWEEIG_fake_script)()
-local function QXXOBWN_fake_script() -- AutoParry.LocalScript 
+coroutine.wrap(XNZZ_fake_script)()
+local function PGECZF_fake_script() -- AutoParry.LocalScript 
 	local script = Instance.new('LocalScript', AutoParry)
 
 	local SGui = script.Parent
@@ -1170,8 +1173,8 @@ local function QXXOBWN_fake_script() -- AutoParry.LocalScript
 	end)
 	
 end
-coroutine.wrap(QXXOBWN_fake_script)()
-local function CFVUQEI_fake_script() -- AutoSpam.LocalScript 
+coroutine.wrap(PGECZF_fake_script)()
+local function IOGFDN_fake_script() -- AutoSpam.LocalScript 
 	local script = Instance.new('LocalScript', AutoSpam)
 
 	local SGui = script.Parent
@@ -1208,8 +1211,8 @@ local function CFVUQEI_fake_script() -- AutoSpam.LocalScript
 	end)
 	
 end
-coroutine.wrap(CFVUQEI_fake_script)()
-local function LIYJ_fake_script() -- MainFrame.RightCtrlToOpenAndClose 
+coroutine.wrap(IOGFDN_fake_script)()
+local function HLMS_fake_script() -- MainFrame.RightCtrlToOpenAndClose 
 	local script = Instance.new('LocalScript', MainFrame)
 
 	local MainFrame = script.Parent
@@ -1228,14 +1231,14 @@ local function LIYJ_fake_script() -- MainFrame.RightCtrlToOpenAndClose
 		end
 	end)
 end
-coroutine.wrap(LIYJ_fake_script)()
-local function TWGFAV_fake_script() -- TextLabel_6.LocalScript 
+coroutine.wrap(HLMS_fake_script)()
+local function TXREWGJ_fake_script() -- TextLabel_6.LocalScript 
 	local script = Instance.new('LocalScript', TextLabel_6)
 
 	script.Parent.Text = "".. game.Players.LocalPlayer.Name .." "
 end
-coroutine.wrap(TWGFAV_fake_script)()
-local function IOTFTJO_fake_script() -- joinnoxinetext.LocalScript 
+coroutine.wrap(TXREWGJ_fake_script)()
+local function JCLQGR_fake_script() -- joinnoxinetext.LocalScript 
 	local script = Instance.new('LocalScript', joinnoxinetext)
 
 	local textLabel = script.Parent
@@ -1253,8 +1256,8 @@ local function IOTFTJO_fake_script() -- joinnoxinetext.LocalScript
 		updateText()
 	end
 end
-coroutine.wrap(IOTFTJO_fake_script)()
-local function TGGGZJQ_fake_script() -- ImageLabel.LocalScript 
+coroutine.wrap(JCLQGR_fake_script)()
+local function FDVJZ_fake_script() -- ImageLabel.LocalScript 
 	local script = Instance.new('LocalScript', ImageLabel)
 
 	local Players = game:GetService("Players")
@@ -1269,8 +1272,8 @@ local function TGGGZJQ_fake_script() -- ImageLabel.LocalScript
 	local imageLabel = script.Parent
 	imageLabel.Image = content
 end
-coroutine.wrap(TGGGZJQ_fake_script)()
-local function BAOP_fake_script() -- MainFrame.SmoothDrag 
+coroutine.wrap(FDVJZ_fake_script)()
+local function XSCDKU_fake_script() -- MainFrame.SmoothDrag 
 	local script = Instance.new('LocalScript', MainFrame)
 
 	local UIS = game:GetService("UserInputService")
@@ -1310,8 +1313,8 @@ local function BAOP_fake_script() -- MainFrame.SmoothDrag
 	end
 	dragify(script.Parent)
 end
-coroutine.wrap(BAOP_fake_script)()
-local function PWUTV_fake_script() -- HackerHubNew.LocalScript 
+coroutine.wrap(XSCDKU_fake_script)()
+local function QYBHK_fake_script() -- HackerHubNew.LocalScript 
 	local script = Instance.new('LocalScript', HackerHubNew)
 
 	local hackerHubGui = script.Parent
@@ -1341,4 +1344,4 @@ local function PWUTV_fake_script() -- HackerHubNew.LocalScript
 	animateGui()
 	
 end
-coroutine.wrap(PWUTV_fake_script)()
+coroutine.wrap(QYBHK_fake_script)()
