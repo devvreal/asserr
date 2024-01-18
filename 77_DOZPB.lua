@@ -15,6 +15,15 @@ local heartbeatConnection
 -- Adjust the radius of the circle
 local circleRadius = 10
 
+-- Create a circle GUI element
+local circle = Instance.new("Frame")
+circle.Size = UDim2.new(0, circleRadius * 2, 0, circleRadius * 2)
+circle.AnchorPoint = Vector2.new(0.5, 0.5)
+circle.Position = UDim2.new(0.5, 0, 0.5, 0)
+circle.BackgroundColor3 = Color3.new(1, 1, 1)
+circle.BackgroundTransparency = 0.5
+circle.Parent = Hotbar
+
 -- Function to check if a ball is within the circle
 local function isBallNearby(ball, circlePosition)
     local ballPosition = ball.Position
@@ -36,14 +45,7 @@ local function ParryNearbyBall()
     end
 end
 
--- Function to update the circle position based on the player's position
-local function UpdateCirclePosition()
-    local playerPosition = character.HumanoidRootPart.Position
-    Hotbar.Ability.Position = Vector2.new(playerPosition.X, playerPosition.Z)
-end
-
 -- Connect the functions to the Heartbeat event
 heartbeatConnection = RunService.Heartbeat:Connect(function()
     ParryNearbyBall()
-    UpdateCirclePosition()
 end)
