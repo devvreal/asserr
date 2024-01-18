@@ -39,6 +39,7 @@ local function ParryNearbyBall()
     
     for _, ball in pairs(PhysicsService:GetPartsInRegion(playerPosition, Vector3.new(circleRadius, circleRadius, circleRadius), nil)) do
         if ball:IsA("Part") and ball.Parent == balls and isBallNearby(ball, playerPosition) then
+            -- Anticipate the ball's arrival by triggering parry in advance
             Remotes:WaitForChild("ParryButtonPress"):Fire()
             Remotes:WaitForChild("ParryButtonPress"):Fire() -- Adjust the number of times to spam the parry button
             return
