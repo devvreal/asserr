@@ -1,48 +1,45 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
 local Remotes = ReplicatedStorage:WaitForChild("Remotes", 9e9)
 local localPlayer = Players.LocalPlayer
 
 local character = localPlayer.Character or localPlayer.CharacterAdded:Wait()
 
-local PlayerGui = localPlayer:WaitForChild("PlayerGui")
-local Hotbar = PlayerGui:WaitForChild("Hotbar")
-
-local uigrad2 = Hotbar.Ability.UIGradient
+local uigrad2 = character:WaitForChild("Humanoid"):WaitForChild("HumanoidDisplay").Parry.UIGradient
 local heartbeatConnection
 
--- Adjust the radius of the circle
-local circleRadius = 10
+-- Adjust the radius of the detection
+local detectionRadius = 20
 
--- Create a circle GUI element
-local circle = Instance.new("Frame")
-circle.Size = UDim2.new(0, circleRadius * 2, 0, circleRadius * 2)
-circle.AnchorPoint = Vector2.new(0.5, 0.5)
-circle.Position = UDim2.new(0.5, 0, 0.5, 0)
-circle.BackgroundColor3 = Color3.new(1, 1, 1)
-circle.BackgroundTransparency = 0.5
-circle.Parent = Hotbar
-
--- Function to check if a ball is within the circle
-local function isBallNearby(ball, circlePosition)
+-- Function to check if a ball is within the detection radius
+local function isBallDetected(ball, playerPosition)
     local ballPosition = ball.Position
-    local distance = (circlePosition - ballPosition).magnitude
-    return distance <= circleRadius
+    local distance = (playerPosition - ballPosition).magnitude
+    return distance <= detectionRadius
 end
 
--- Function to automatically parry without missing
-local function AutoParry()
-    local balls = workspace:WaitForChild("Balls") -- Change "Balls" to the actual name of the ball part
+-- Function to parry the ball
+local function ParryBall()
+    Remotes:WaitForChild("ParryButtonPress"):Fire()
+    Remotes:WaitForChild("ParryButtonPress"):Fire() -- Adjust the number of times to spam the parry button
+end
+
+-- Connect the functions to the Heartbeat event
+heartbeatConnection = game:GetService("RunService").Heartbeat:Connect(function()
     local playerPosition = character.HumanoidRootPart.Position
+    local balls = workspace:WaitForChild("Balls") -- Change "Balls" to the actual name of the ball part
     
     for _, ball in pairs(balls:GetChildren()) do
-        if ball:IsA("Part") and isBallNearby(ball, playerPosition) then
-            Remotes:WaitForChild("ParryButtonPress"):Fire()
-            Remotes:WaitForChild("ParryButtonPress"):Fire() -- Adjust the number of times to spam the parry button
+        if ball:IsA("Part") and isBallDetected(ball, playerPosition) then
+            ParryBall()
         end
     end
-end
+end)
 
--- Connect the AutoParry function to the Heartbeat event
-heartbeatConnection = RunService.Heartbeat:Connect(AutoParry)
+-- Additional: Use UserInputService to immediately detect the ball when clicked
+UserInputService.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        ParryBall()
+    end
+end)
