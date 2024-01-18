@@ -31,8 +31,8 @@ local function isBallNearby(ball, circlePosition)
     return distance <= circleRadius
 end
 
--- Function to find and parry the nearest ball
-local function ParryNearbyBall()
+-- Function to automatically parry without missing
+local function AutoParry()
     local balls = workspace:WaitForChild("Balls") -- Change "Balls" to the actual name of the ball part
     local playerPosition = character.HumanoidRootPart.Position
     
@@ -40,12 +40,9 @@ local function ParryNearbyBall()
         if ball:IsA("Part") and isBallNearby(ball, playerPosition) then
             Remotes:WaitForChild("ParryButtonPress"):Fire()
             Remotes:WaitForChild("ParryButtonPress"):Fire() -- Adjust the number of times to spam the parry button
-            return
         end
     end
 end
 
--- Connect the functions to the Heartbeat event
-heartbeatConnection = RunService.Heartbeat:Connect(function()
-    ParryNearbyBall()
-end)
+-- Connect the AutoParry function to the Heartbeat event
+heartbeatConnection = RunService.Heartbeat:Connect(AutoParry)
