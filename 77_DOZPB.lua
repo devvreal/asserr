@@ -37,13 +37,19 @@ local function ParryNearbyBall()
     local balls = workspace:WaitForChild("Balls") -- Change "Balls" to the actual name of the ball part
     local playerPosition = character.HumanoidRootPart.Position
     
+    local shouldParry = false
+    
     for _, ball in pairs(PhysicsService:GetPartsInRegion(playerPosition, Vector3.new(circleRadius, circleRadius, circleRadius), nil)) do
         if ball:IsA("Part") and ball.Parent == balls and isBallNearby(ball, playerPosition) then
-            -- Anticipate the ball's arrival by triggering parry in advance
-            Remotes:WaitForChild("ParryButtonPress"):Fire()
-            Remotes:WaitForChild("ParryButtonPress"):Fire() -- Adjust the number of times to spam the parry button
-            return
+            shouldParry = true
+            break
         end
+    end
+    
+    -- Trigger parry based on the boolean condition
+    if shouldParry then
+        Remotes:WaitForChild("ParryButtonPress"):Fire()
+        Remotes:WaitForChild("ParryButtonPress"):Fire() -- Adjust the number of times to spam the parry button
     end
 end
 
