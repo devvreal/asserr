@@ -1,22 +1,24 @@
-local RunService = game:GetService("RunService")
-local Players = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local StatsService = game:GetService("Stats")
+local Cloneref = cloneref or function(Object)
+    return Object
+end
 
+local StatsService = Cloneref(game:GetService("Stats"))
+local UserInputService = Cloneref(game:GetService("UserInputService"))
+local ReplicatedStorage = Cloneref(game:GetService("ReplicatedStorage"))
+local Players = Cloneref(game:GetService("Players"))
 local Player = Players.LocalPlayer
 local Remotes = ReplicatedStorage:WaitForChild("Remotes", 9e9)
-local Balls = workspace.Balls
 
 local Storage = {
     LastTick = os.clock(),
     LastBallPosition = nil,
     AttemptedParry = false,
-    ParryCooldown = 2,
+    ParryCooldown = 2,  -- Set the cooldown time in seconds
 }
 
-local function GetBalls()
+local function GetBall()
     local RealBall, OtherBall = nil, nil
-    for _, Object in pairs(Balls:GetChildren()) do
+    for _, Object in pairs(workspace.Balls:GetChildren()) do
         if Object:GetAttribute("realBall") == true then
             RealBall = Object
         else
@@ -28,6 +30,7 @@ end
 
 local function debounce()
     local lastTime = 0
+
     return function()
         local currentTime = os.clock()
         if currentTime - lastTime >= Storage.ParryCooldown then
@@ -48,11 +51,11 @@ local function AutoParry()
     end
 end
 
-RunService.PostSimulation:Connect(function()
-    local RealBall, OtherBall = GetBalls()
+game:GetService("RunService").PostSimulation:Connect(function()
+    local RealBall, OtherBall = GetBall()
     if RealBall and OtherBall then
         if Storage.LastBallPosition then
-            if Player.Character and Player.Character:FindFirstChild("Highlight") then
+            if Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") then
                 local DeltaT = os.clock() - Storage.LastTick
                 local Velocity = (OtherBall.Position - Storage.LastBallPosition) / DeltaT
                 local VelocityMagnitude = Velocity.Magnitude
@@ -62,12 +65,10 @@ RunService.PostSimulation:Connect(function()
                 local EstimatedTimeToReachPlayer = (ServerPing / VelocityMagnitude) / (ServerPing / DistanceToPlayer)
                 local TimeToParry = 0.2 * (VelocityMagnitude / DistanceToPlayer)
 
-                if EstimatedTimeToReachPlayer ~= math.huge and TimeToParry < 12 then
-                    if EstimatedTimeToReachPlayer <= TimeToParry then
-                        AutoParry()
-                    else
-                        Storage.AttemptedParry = false
-                    end
+                if VelocityMagnitude > 0 and EstimatedTimeToReachPlayer <= TimeToParry then
+                    AutoParry()
+                else
+                    Storage.AttemptedParry = false
                 end
             else
                 Storage.AttemptedParry = false
