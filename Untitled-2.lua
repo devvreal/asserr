@@ -46,6 +46,15 @@ local function AutoParry()
     end)
 end
 
+local function EnableAutoParry()
+    getgenv().AutoParryEnabled = true
+    AutoParry()
+end
+
+local function DisableAutoParry()
+    getgenv().AutoParryEnabled = false
+end
+
 local function SuperClick()
     task.spawn(function()
         if IsAlive() and #Alive:GetChildren() > 1 then
@@ -63,19 +72,70 @@ end
 
 task.spawn(function()
     while task.wait() do
-        local NearestPlayer = get_ProxyPlayer()
-        local Ball = Balls:FindFirstChildWhichIsA("Part") -- Assuming the balls are parts
-
-        if NearestPlayer and NearestPlayer:FindFirstChild("Humanoid") and NearestPlayer.Humanoid.Health > 50 then
-            local PlayerPP = Player and Player.Character and Player.Character.PrimaryPart
-            local PlayerDistance = (PlayerPP.Position - NearestPlayer.PrimaryPart.Position).Magnitude
-            local BallDistance = (PlayerPP.Position - Ball.Position).Magnitude
-
-            if BallDistance < 55 then
-                SuperClick()
-            elseif PlayerDistance < 25 then
-                AutoParry()
-            end
+        if getgenv().SpamClickA and getgenv().AutoDetectSpam then
+            SuperClick()
+        end
+        if getgenv().AutoDetectSpam and not getgenv().AutoParryEnabled then
+            EnableAutoParry()
+        elseif not getgenv().AutoDetectSpam and getgenv().AutoParryEnabled then
+            DisableAutoParry()
         end
     end
+end)
+
+local ParryCounter = 0
+local DetectSpamDistance = 0
+
+local function GetBall(ball)
+    local Target = ""
+
+    ball:GetPropertyChangedSignal("Position"):Connect(function()
+        local PlayerPP = Player and Player.Character and Player.Character.PrimaryPart
+        local NearestPlayer = get_ProxyPlayer()
+
+        if ball and PlayerPP and NearestPlayer and NearestPlayer.PrimaryPart then
+            local PlayerDistance = (PlayerPP.Position - NearestPlayer.PrimaryPart.Position).Magnitude
+            local BallDistance = (PlayerPP.Position - ball.Position).Magnitude
+
+            DetectSpamDistance = 25 + math.clamp(ParryCounter / 3, 0, 25)
+
+            if ParryCounter > 2 and PlayerDistance < DetectSpamDistance and BallDistance < 55 then
+                getgenv().SpamClickA = true
+            else
+                getgenv().SpamClickA = false
+            end
+        end
+    end)
+    ball:GetAttributeChangedSignal("target"):Connect(function()
+        Target = ball:GetAttribute("target")
+        local NearestPlayer = get_ProxyPlayer()
+
+        if NearestPlayer then
+            if Target == NearestPlayer.Name or Target == Player.Name then
+                ParryCounter = ParryCounter + 1
+            else
+                ParryCounter = 0
+            end
+        end
+    end)
+end
+
+for _, ball in pairs(Balls:GetChildren()) do
+    if ball and not ball:GetAttribute("realBall") then
+        return
+    end
+
+    GetBall(ball)
+end
+
+Balls.ChildAdded:Connect(function(ball)
+    if not getgenv().AutoDetectSpam then
+        return
+    elseif ball and not ball:GetAttribute("realBall") then
+        return
+    end
+
+    getgenv().SpamClickA = false
+    ParryCounter = 0
+    GetBall(ball)
 end)
