@@ -1,80 +1,81 @@
-local Cloneref = cloneref or function(Object)
-    return Object
-end
+getgenv().AutoDetectSpam = true
 
-local StatsService = Cloneref(game:GetService("Stats"))
-local UserInputService = Cloneref(game:GetService("UserInputService"))
-local ReplicatedStorage = Cloneref(game:GetService("ReplicatedStorage"))
-local Players = Cloneref(game:GetService("Players"))
+local Alive = workspace:WaitForChild("Alive", 9e9)
+local Players = game:GetService("Players")
 local Player = Players.LocalPlayer
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Remotes = ReplicatedStorage:WaitForChild("Remotes", 9e9)
+local ParryAttempt = Remotes:WaitForChild("ParryAttempt", 9e9)
+local Balls = workspace:WaitForChild("Balls", 9e9)
 
-local Storage = {
-    LastTick = os.clock(),
-    LastBallPosition = nil,
-    AttemptedParry = false,
-    ParryCooldown = 2,  -- Set the cooldown time in seconds
-}
+local function get_ProxyPlayer()
+    local Distance = math.huge
+    local plrRP = Player.Character and Player.Character:FindFirstChild("HumanoidRootPart")
+    local PlayerReturn = nil
 
-local function GetBall()
-    local RealBall, OtherBall = nil, nil
-    for _, Object in pairs(workspace.Balls:GetChildren()) do
-        if Object:GetAttribute("realBall") == true then
-            RealBall = Object
-        else
-            OtherBall = Object
-        end
-    end
-    return RealBall, OtherBall
-end
-
-local function debounce()
-    local lastTime = 0
-
-    return function()
-        local currentTime = os.clock()
-        if currentTime - lastTime >= Storage.ParryCooldown then
-            lastTime = currentTime
-            return true
-        else
-            return false
-        end
-    end
-end
-
-local parryDebouncer = debounce()
-
-local function AutoParry()
-    if not Storage.AttemptedParry and parryDebouncer() then
-        Remotes:WaitForChild("ParryButtonPress"):Fire()
-        Storage.AttemptedParry = true
-    end
-end
-
-game:GetService("RunService").PostSimulation:Connect(function()
-    local RealBall, OtherBall = GetBall()
-    if RealBall and OtherBall then
-        if Storage.LastBallPosition then
-            if Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") then
-                local DeltaT = os.clock() - Storage.LastTick
-                local Velocity = (OtherBall.Position - Storage.LastBallPosition) / DeltaT
-                local VelocityMagnitude = Velocity.Magnitude
-
-                local ServerPing = StatsService.Network.ServerStatsItem["Data Ping"]:GetValue()
-                local DistanceToPlayer = (Player.Character.HumanoidRootPart.Position - OtherBall.Position).Magnitude
-                local EstimatedTimeToReachPlayer = (ServerPing / VelocityMagnitude) / (ServerPing / DistanceToPlayer)
-                local TimeToParry = 0.2 * (VelocityMagnitude / DistanceToPlayer)
-
-                if VelocityMagnitude > 0 and EstimatedTimeToReachPlayer <= TimeToParry then
-                    AutoParry()
-                else
-                    Storage.AttemptedParry = false
+    for _, plr1 in pairs(Alive:GetChildren()) do
+        if plr1:FindFirstChild("Humanoid") and plr1.Humanoid.Health > 50 then
+            if plr1.Name ~= Player.Name and plrRP and plr1:FindFirstChild("HumanoidRootPart") then
+                local magnitude = (plr1.HumanoidRootPart.Position - plrRP.Position).Magnitude
+                if magnitude <= Distance then
+                    Distance = magnitude
+                    PlayerReturn = plr1
                 end
-            else
-                Storage.AttemptedParry = false
             end
         end
-        Storage.LastBallPosition = OtherBall.Position
     end
-    Storage.LastTick = os.clock()
+    return PlayerReturn
+end
+
+local function AutoParry()
+    task.spawn(function()
+        while task.wait() do
+            local NearestPlayer = get_ProxyPlayer()
+            if NearestPlayer and NearestPlayer:FindFirstChild("Humanoid") and NearestPlayer.Humanoid.Health > 50 then
+                local args1 = 0.5
+                local args2 = CFrame.new()
+                local args3 = {["enzo"] = Vector3.new()}
+                local args4 = {500, 500}
+
+                if args1 and args2 and args3 and args4 then
+                    ParryAttempt:FireServer(args1, args2, args3, args4)
+                end
+            end
+        end
+    end)
+end
+
+local function SuperClick()
+    task.spawn(function()
+        if IsAlive() and #Alive:GetChildren() > 1 then
+            local args1 = 0.5
+            local args2 = CFrame.new()
+            local args3 = {["enzo"] = Vector3.new()}
+            local args4 = {500, 500}
+
+            if args1 and args2 and args3 and args4 then
+                ParryAttempt:FireServer(args1, args2, args3, args4)
+            end
+        end
+    end)
+end
+
+task.spawn(function()
+    while task.wait() do
+        local NearestPlayer = get_ProxyPlayer()
+        local Ball = Balls:FindFirstChildWhichIsA("Part") -- Assuming the balls are parts
+
+        if NearestPlayer and NearestPlayer:FindFirstChild("Humanoid") and NearestPlayer.Humanoid.Health > 50 then
+            local PlayerPP = Player and Player.Character and Player.Character.PrimaryPart
+            local PlayerDistance = (PlayerPP.Position - NearestPlayer.PrimaryPart.Position).Magnitude
+            local BallDistance = (PlayerPP.Position - Ball.Position).Magnitude
+
+            if BallDistance < 55 then
+                SuperClick()
+            elseif PlayerDistance < 25 then
+                AutoParry()
+            end
+        end
+    end
 end)
