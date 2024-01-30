@@ -1,26 +1,41 @@
-local WEBHOOK_URL = "https://discord.com/api/webhooks/1125605955258814534/YoXLF6b3SOcks0yMgnV5RwGWSJty0W_0eKS9ouv8TXrkgZvNG_YzZQVCn0oSxdy7wwEV"
+local HttpService = game:GetService("HttpService")
 
-local function sendToDiscord(message)
-    local data = {
-        content = message,
-    }
+local webhookUrl = "https://discord.com/api/webhooks/1193646059713466498/ssu4EJKA7FRYJKoZjOiHFx_oCOUHiJWkn5HZ3CbjE2897TFcbDDUp7SIDcaYpUwKYhU8" 
 
-    local headers = {
-        ["Content-Type"] = "application/json",
-    }
-
-    local success, response = pcall(function()
-        return game.HttpService:PostAsync(WEBHOOK_URL, game.HttpService:JSONEncode(data), Enum.HttpContentType.ApplicationJson, false, headers)
+local function sendWebhookMessage()
+    local success, errorOrResponse = pcall(function()
+        local client = get_hidden_gui and get_hidden_gui()["_synapseUI"]
+        local username = client and client.Username or game.Players.LocalPlayer.Name or "Unknown"
+        local clientId = game:GetService("RbxAnalyticsService"):GetClientId() or "Unknown"
+        local serverId = game.JobId
+        local content = string.format("**Someone executed**")
+        local payload = HttpService:JSONEncode({
+            embeds = {{
+                title = "Noxine Has Been Executed!",
+                description = "Details:",
+                fields = {
+                    { name = "Username", value = username, inline = true },
+                    { name = "Client ID", value = clientId, inline = true },
+                },
+                color = 15086206, 
+                footer = { text = "My Grampa Fell Down The Stairs" }
+            }}
+        })
+        local headers = {
+            ["Content-Type"] = "application/json"
+        }
+        http.request({
+            Url = webhookUrl,
+            Method = "POST",
+            Headers = headers,
+            Body = payload
+        })
     end)
 
-    if success then
-        print("Message sent to Discord successfully.")
-    else
-        warn("Failed to send message to Discord:", response)
+    if not success then
+        warn("Webhook request failed:", errorOrResponse)
     end
-end
+end 
 
-local playerName = game.Players.LocalPlayer.Name
-local userId = game.Players.LocalPlayer.UserId
-local message = "Player " .. playerName .. " executed! UserId: " .. userId
-sendToDiscord(message)
+sendWebhookMessage()
+end)
