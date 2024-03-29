@@ -1,521 +1,346 @@
+local Library = loadstring(Game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/wizard"))()
 
-local G2L = {};
+local PhantomForcesWindow = Library:NewWindow("Noxine")
 
-G2L["1"] = Instance.new("ScreenGui", game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui"));
-G2L["1"]["IgnoreGuiInset"] = true;
-G2L["1"]["ScreenInsets"] = Enum.ScreenInsets.DeviceSafeInsets;
-G2L["1"]["Name"] = [[INTRO WIE GTA]];
-G2L["1"]["ZIndexBehavior"] = Enum.ZIndexBehavior.Sibling;
-G2L["1"]["ResetOnSpawn"] = false;
+local KillingCheats = PhantomForcesWindow:NewSection("Official")
 
--- StarterGui.INTRO WIE GTA.Background
-G2L["2"] = Instance.new("Frame", G2L["1"]);
-G2L["2"]["BackgroundColor3"] = Color3.fromRGB(0, 0, 0);
-G2L["2"]["Size"] = UDim2.new(1, 0, 1, 0);
-G2L["2"]["Position"] = UDim2.new(-0.0003665611147880554, 0, 0, 0);
-G2L["2"]["Name"] = [[Background]];
+KillingCheats:CreateButton("Auto Parry", function()
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Workspace = game:GetService("Workspace")
+local Camera = Workspace.CurrentCamera
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Remotes = ReplicatedStorage:WaitForChild("Remotes")
+local Balls = Workspace:WaitForChild("Balls")
 
--- StarterGui.INTRO WIE GTA.Background.LocalScript
-G2L["3"] = Instance.new("LocalScript", G2L["2"]);
-G2L["3"]["Enabled"] = false;
-G2L["3"]["Disabled"] = true;
+local Signal = {}
 
--- StarterGui.INTRO WIE GTA.Background.loadingcircle
-G2L["4"] = Instance.new("ImageLabel", G2L["2"]);
-G2L["4"]["ZIndex"] = 3;
-G2L["4"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
-G2L["4"]["Visible"] = false;
-G2L["4"]["Image"] = [[http://www.roblox.com/asset/?id=4463059046]];
-G2L["4"]["Size"] = UDim2.new(0, 24, 0, 23);
-G2L["4"]["Name"] = [[loadingcircle]];
-G2L["4"]["BackgroundTransparency"] = 1;
-G2L["4"]["Position"] = UDim2.new(0.014570904895663261, 0, 0.9297385215759277, 0);
-
--- StarterGui.INTRO WIE GTA.Background.loadingcircle.UIAspectRatioConstraint
-G2L["5"] = Instance.new("UIAspectRatioConstraint", G2L["4"]);
+local debounce = false
+local lastTime = nil
 
 
--- StarterGui.INTRO WIE GTA.Background.LoadingGame
-G2L["6"] = Instance.new("TextLabel", G2L["2"]);
-G2L["6"]["ZIndex"] = 3;
-G2L["6"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
-G2L["6"]["FontFace"] = Font.new([[rbxasset://fonts/families/TitilliumWeb.json]], Enum.FontWeight.Regular, Enum.FontStyle.Normal);
-G2L["6"]["TextTransparency"] = 1;
-G2L["6"]["TextSize"] = 30;
-G2L["6"]["TextColor3"] = Color3.fromRGB(222, 222, 222);
-G2L["6"]["Size"] = UDim2.new(0, 200, 0, 50);
-G2L["6"]["Text"] = [[Es lädt...]];
-G2L["6"]["Name"] = [[LoadingGame]];
-G2L["6"]["BackgroundTransparency"] = 1;
-G2L["6"]["Position"] = UDim2.new(0.014236897230148315, 0, 0.9063856601715088, 0);
-
--- StarterGui.INTRO WIE GTA.Background.GameNameTextLabel
-G2L["7"] = Instance.new("TextLabel", G2L["2"]);
-G2L["7"]["TextWrapped"] = true;
-G2L["7"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
-G2L["7"]["FontFace"] = Font.new([[rbxasset://fonts/families/DenkOne.json]], Enum.FontWeight.Regular, Enum.FontStyle.Normal);
-G2L["7"]["TextTransparency"] = 1;
-G2L["7"]["TextSize"] = 62;
-G2L["7"]["TextColor3"] = Color3.fromRGB(255, 255, 255);
-G2L["7"]["Size"] = UDim2.new(1, 0, 1, 0);
-G2L["7"]["Text"] = [[Narburg RP]];
-G2L["7"]["Name"] = [[GameNameTextLabel]];
-G2L["7"]["BackgroundTransparency"] = 1;
-G2L["7"]["Position"] = UDim2.new(-0.012149081565439701, 0, -3.725290298461914e-08, 0);
-
--- StarterGui.INTRO WIE GTA.Background.Icones
-G2L["8"] = Instance.new("Frame", G2L["2"]);
-G2L["8"]["BackgroundColor3"] = Color3.fromRGB(233, 156, 0);
-G2L["8"]["BackgroundTransparency"] = 1;
-G2L["8"]["Size"] = UDim2.new(1, 0, 1, 0);
-G2L["8"]["Name"] = [[Icones]];
-
--- StarterGui.INTRO WIE GTA.Background.Icones.UICorner
-G2L["9"] = Instance.new("UICorner", G2L["8"]);
-G2L["9"]["CornerRadius"] = UDim.new(0, 17);
-
--- StarterGui.INTRO WIE GTA.Background.Icones.Roblox
-G2L["a"] = Instance.new("Frame", G2L["8"]);
-G2L["a"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
-G2L["a"]["BackgroundTransparency"] = 1;
-G2L["a"]["Size"] = UDim2.new(1, 0, 1, 0);
-G2L["a"]["Name"] = [[Roblox]];
-
--- StarterGui.INTRO WIE GTA.Background.Icones.Roblox.Icone
-G2L["b"] = Instance.new("ImageLabel", G2L["a"]);
-G2L["b"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
-G2L["b"]["Visible"] = false;
-G2L["b"]["Image"] = [[http://www.roblox.com/asset/?id=10762290938]];
-G2L["b"]["Size"] = UDim2.new(0.10000000149011612, 100, 0.10000000149011612, 100);
-G2L["b"]["Name"] = [[Icone]];
-G2L["b"]["BackgroundTransparency"] = 1;
-G2L["b"]["Position"] = UDim2.new(0.3790000081062317, 0, 0.3490000069141388, 0);
-
--- StarterGui.INTRO WIE GTA.Background.Icones.Roblox.Icone.UIAspectRatioConstraint
-G2L["c"] = Instance.new("UIAspectRatioConstraint", G2L["b"]);
+local function calculateProjectileTime(initialPosition, targetPosition, initialVelocity)
+    local distance = (targetPosition - initialPosition).Magnitude
+    local time = distance / initialVelocity.Magnitude
+    return time
+end
 
 
--- StarterGui.INTRO WIE GTA.Background.Icones.Roblox.UIListLayout
-G2L["d"] = Instance.new("UIListLayout", G2L["a"]);
-G2L["d"]["VerticalAlignment"] = Enum.VerticalAlignment.Center;
-G2L["d"]["HorizontalAlignment"] = Enum.HorizontalAlignment.Center;
-G2L["d"]["SortOrder"] = Enum.SortOrder.LayoutOrder;
-
--- StarterGui.INTRO WIE GTA.Background.Icones.Rockstar
-G2L["e"] = Instance.new("Frame", G2L["8"]);
-G2L["e"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
-G2L["e"]["BackgroundTransparency"] = 1;
-G2L["e"]["Size"] = UDim2.new(1, 0, 1, 0);
-G2L["e"]["Name"] = [[Rockstar]];
-
--- StarterGui.INTRO WIE GTA.Background.Icones.Rockstar.Icone
-G2L["f"] = Instance.new("ImageLabel", G2L["e"]);
-G2L["f"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
-G2L["f"]["Visible"] = false;
-G2L["f"]["Image"] = [[http://www.roblox.com/asset/?id=15506794987]];
-G2L["f"]["Size"] = UDim2.new(0.10000000149011612, 100, 0.10000000149011612, 100);
-G2L["f"]["Name"] = [[Icone]];
-G2L["f"]["BackgroundTransparency"] = 1;
-G2L["f"]["Position"] = UDim2.new(0.3790000081062317, 0, 0.3490000069141388, 0);
-
--- StarterGui.INTRO WIE GTA.Background.Icones.Rockstar.Icone.UIAspectRatioConstraint
-G2L["10"] = Instance.new("UIAspectRatioConstraint", G2L["f"]);
+local function calculateDistance(point1, point2)
+    return (point1 - point2).Magnitude
+end
 
 
--- StarterGui.INTRO WIE GTA.Background.Icones.Rockstar.UIListLayout
-G2L["11"] = Instance.new("UIListLayout", G2L["e"]);
-G2L["11"]["VerticalAlignment"] = Enum.VerticalAlignment.Center;
-G2L["11"]["HorizontalAlignment"] = Enum.HorizontalAlignment.Center;
-G2L["11"]["SortOrder"] = Enum.SortOrder.LayoutOrder;
-
--- StarterGui.INTRO WIE GTA.Background.Icones.Custom
-G2L["12"] = Instance.new("Frame", G2L["8"]);
-G2L["12"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
-G2L["12"]["BackgroundTransparency"] = 1;
-G2L["12"]["Size"] = UDim2.new(1, 0, 1, 0);
-G2L["12"]["Name"] = [[Custom]];
-
--- StarterGui.INTRO WIE GTA.Background.Icones.Custom.Icone
-G2L["13"] = Instance.new("ImageLabel", G2L["12"]);
-G2L["13"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
-G2L["13"]["Visible"] = false;
-G2L["13"]["Image"] = [[rbxassetid://13689269256]];
-G2L["13"]["Size"] = UDim2.new(0.10000000149011612, 100, 0.10000000149011612, 100);
-G2L["13"]["Name"] = [[Icone]];
-G2L["13"]["BackgroundTransparency"] = 1;
-G2L["13"]["Position"] = UDim2.new(0.4219072163105011, 0, 0.40973004698753357, 0);
-
--- StarterGui.INTRO WIE GTA.Background.Icones.Custom.Icone.UIAspectRatioConstraint
-G2L["14"] = Instance.new("UIAspectRatioConstraint", G2L["13"]);
+local function canObjectParry(projectilePosition, objectPosition, projectileVelocity, objectVelocity)
+    local timeToIntercept = calculateProjectileTime(projectilePosition, objectPosition, projectileVelocity)
+    local distanceToIntercept = calculateDistance(projectilePosition + projectileVelocity * timeToIntercept, objectPosition + objectVelocity * timeToIntercept)
 
 
--- StarterGui.INTRO WIE GTA.Background.Icones.Custom.UIListLayout
-G2L["15"] = Instance.new("UIListLayout", G2L["12"]);
-G2L["15"]["VerticalAlignment"] = Enum.VerticalAlignment.Center;
-G2L["15"]["HorizontalAlignment"] = Enum.HorizontalAlignment.Center;
-G2L["15"]["SortOrder"] = Enum.SortOrder.LayoutOrder;
+    local conditions = {
+        (distanceToIntercept <= 75),
+        (distanceToIntercept >= 35 and distanceToIntercept <= 50 and timeToIntercept <= 0.6),
+        (distanceToIntercept >= 50 and distanceToIntercept <= 75 and timeToIntercept >= 0.6 and timeToIntercept <= 0.75),
+        (distanceToIntercept <= 35 and timeToIntercept <= 0.5),
+        (distanceToIntercept <= 12.5 and timeToIntercept >= 0.5 and timeToIntercept <= 0.75),
+        (distanceToIntercept <= 0.025 and timeToIntercept <= 0.75),
+        (distanceToIntercept >= 75 and distanceToIntercept <= 100 and timeToIntercept <= 0.5)
+    }
 
--- StarterGui.INTRO WIE GTA.Background.Icone
-G2L["16"] = Instance.new("ImageLabel", G2L["2"]);
-G2L["16"]["ZIndex"] = 2;
-G2L["16"]["BorderSizePixel"] = 0;
-G2L["16"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
-G2L["16"]["ImageTransparency"] = 1;
-G2L["16"]["Image"] = [[rbxassetid://13688538868]];
-G2L["16"]["Size"] = UDim2.new(0.6000000238418579, 0, 0.7008474469184875, 0);
-G2L["16"]["Name"] = [[Icone]];
-G2L["16"]["BackgroundTransparency"] = 1;
-G2L["16"]["Position"] = UDim2.new(0.38499999046325684, 0, 0.3499999940395355, 0);
-
--- StarterGui.INTRO WIE GTA.Background.LoadingHandle
-G2L["17"] = Instance.new("LocalScript", G2L["2"]);
-G2L["17"]["Name"] = [[LoadingHandle]];
-
--- StarterGui.INTRO WIE GTA.Background.CutsceneModule
-G2L["18"] = Instance.new("ModuleScript", G2L["2"]);
-G2L["18"]["Name"] = [[CutsceneModule]];
-
--- StarterGui.INTRO WIE GTA.Background.Handle
-G2L["19"] = Instance.new("LocalScript", G2L["2"]);
-G2L["19"]["Name"] = [[Handle]];
-
--- StarterGui.INTRO WIE GTA.Background.Background
-G2L["1a"] = Instance.new("ImageLabel", G2L["2"]);
-G2L["1a"]["BorderSizePixel"] = 0;
-G2L["1a"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255);
-G2L["1a"]["ImageTransparency"] = 1;
-G2L["1a"]["Image"] = [[rbxassetid://13688621037]];
-G2L["1a"]["Size"] = UDim2.new(1, 0, 1, 0);
-G2L["1a"]["Name"] = [[Background]];
-G2L["1a"]["BackgroundTransparency"] = 1;
-G2L["1a"]["Position"] = UDim2.new(-0.029999999329447746, 0, 0, 0);
-
--- StarterGui.INTRO WIE GTA.Background.CoresGui
-G2L["1b"] = Instance.new("LocalScript", G2L["2"]);
-G2L["1b"]["Name"] = [[CoresGui]];
-
--- Require G2L wrapper
-local G2L_REQUIRE = require;
-local G2L_MODULES = {};
-local function require(Module:ModuleScript)
-    local ModuleState = G2L_MODULES[Module];
-    if ModuleState then
-        if not ModuleState.Required then
-            ModuleState.Required = true;
-            ModuleState.Value = ModuleState.Closure();
+    for _, condition in ipairs(conditions) do
+        if condition then
+            return true
         end
-        return ModuleState.Value;
-    end;
-    return G2L_REQUIRE(Module);
-end
+    end
 
-G2L_MODULES[G2L["18"]] = {
-Closure = function()
-    local script = G2L["18"];
-local module = {}
-
-
-
---[[
-SP = Start Position
-FP = Final Position
-]]
-local TweenService = game:GetService("TweenService")
-local Tweeninfo = TweenInfo.new(10, Enum.EasingStyle.Linear,Enum.EasingDirection.In)
-module.Config = {
-	Left = {
-		SP={
-			Background=UDim2.fromScale(-0.07, 0),
-			Icone=UDim2.fromScale(0.1,0.35)
-		},
-		FP={
-			Background=UDim2.fromScale(0.1, 0),
-			Icone=UDim2.fromScale(0.3,0.35)
-		}
-	},
-	Right = {
-		SP={
-			Background=UDim2.fromScale(0.1,0),
-			Icone=UDim2.fromScale(0.285,0.35)
-		},
-		FP={
-			Background=UDim2.fromScale(-0.03,0),
-			Icone=UDim2.fromScale(0.2,0.35)
-		}
-	}
-}
-
-module.Combos = {
-	[1]={
-		Background={
-			Id=0,
-			Direction="Left"
-		},
-		Icone={
-			Id=13688452557,
-			Direction="Right"
-		}
-	},
-	[2]={
-		Background={
-			Id=0,
-			Direction="Right"
-		},
-		Icone={
-			Id=13688474575,
-			Direction="Left"
-		}
-	},
-	[3]={
-		Background={
-			Id=0,
-			Direction="Left"
-		},
-		Icone={
-			Id=13688538868,
-			Direction="Right"
-		}
-	},
-	[4]={
-		Background={
-			Id=0,
-			Direction="Right"
-		},
-		Icone={
-			Id=13688651153,
-			Direction="Left"
-		}
-	},
-	[5]={
-		Background={
-			Id=0,
-			Direction="Left"
-		},
-		Icone={
-			Id=12184875566,
-			Direction="Right"
-		}
-	},
-	[6]={
-		Background={
-			Id=0,
-			Direction="Right"
-		},
-		Icone={
-			Id=12185389804,
-			Direction="Left"
-		}
-	},
-	[7]={
-		Background={
-			Id=0,
-			Direction="Left"
-		},
-		Icone={
-			Id=12188840307,
-			Direction="Right"
-		}
-	}
-}
-
-local ed = Enum.EasingDirection.In
-local es = Enum.EasingStyle.Sine
-local es2 = Enum.EasingStyle.Linear
-
-function module.AnimarIcone(icone,anim)
-	icone.ImageTransparency = 1	
-	icone.Visible = true
-	
-	for i=1,0,-0.1 do
-		wait()
-		icone.ImageTransparency = i
-	end
-	wait(1)
-	if anim then
-		icone:TweenSize(UDim2.new(0.1, 100,0.04, 100),ed,es,0.8)	
-	end
-	for i=0,1,0.1 do
-		wait()
-		icone.ImageTransparency = i
-	end
-	wait(1.2)
-end
-
-local Icone = script.Parent.Icone
-local Background = script.Parent.Background
-
-function module.Animar(combo)
-	wait()
-	Icone.Image = "rbxassetid://".. combo.Icone.Id
-	Background.Image = "rbxassetid://"..combo.Background.Id
-	
-	Icone.Position = module.Config[combo.Icone.Direction].SP.Icone
-	Background.Position = module.Config[combo.Background.Direction].SP.Background
-	
-	for i=1,0,-0.1 do
-		wait()
-		Icone.ImageTransparency = i
-		Background.ImageTransparency = i
-	end
-	local IconeTween = TweenService:Create(Icone,Tweeninfo,{Position=module.Config[combo.Icone.Direction].FP.Icone})
-	local BackgroundTween = TweenService:Create(Background,Tweeninfo,{Position=module.Config[combo.Background.Direction].FP.Background})
-	--Icone:TweenPosition(module.Config[combo.Icone.Direction].FP.Icone,ed,es2,12)
-	--Background:TweenPosition(module.Config[combo.Background.Direction].FP.Background,ed,es2,7)
-	IconeTween:Play()
-	BackgroundTween:Play()
-	wait(5)
-	
-	wait(0.2)
-	for i=0,1,0.1 do
-		wait()
-		Icone.ImageTransparency = i
-		Background.ImageTransparency = i
-	end
-	IconeTween:Pause()
-	BackgroundTween:Pause()
+    return false
 end
 
 
-
-
-function module.randomizarCombos ()
-	local combos = {}
-	
-	
-	
-	local direita = {}
-	local esquerda = {}
-	
-	for i=1, #module.Combos do
-		local combo = module.Combos[i]	
-		if combo.Background.Direction == "Right" then
-			table.insert(direita,combo)
-		else
-			table.insert(esquerda,combo)
-		end
-	end
-	local TD = #direita
-	local TE = #esquerda
-	wait()
-	local ultimo = "Right"
-	while #direita + #esquerda > 0 do
-		wait()
-		if ultimo == "Left" then
-			local escolhido = math.random(1,TD)
-			table.insert(combos,direita[escolhido])
-			table.remove(direita,escolhido)
-			ultimo = "Right"
-		else
-			local escolhido = math.random(1,TE)
-			table.insert(combos,esquerda[escolhido])
-			table.remove(esquerda,escolhido)
-			ultimo = "Left"
-		end
-		
-	end
-	return combos
+local function parry()
+    if LocalPlayer.Character then
+        local Remote = Remotes:FindFirstChild("ParryAttempt")
+        if Remote then
+            local WorldToScreenPoint = Camera:WorldToScreenPoint(LocalPlayer.Character.HumanoidRootPart.Position)
+            local args = {
+                [1] = 0.2,
+                [2] = Camera.CFrame,
+                [3] = {},
+                [4] = {
+                    [1] = WorldToScreenPoint.X,
+                    [2] = WorldToScreenPoint.Y
+                }
+            }
+            Remote:FireServer(unpack(args))
+        end
+    end
 end
 
-return module
 
-end;
-};
--- StarterGui.INTRO WIE GTA.Background.LoadingHandle
-local function C_17()
-local script = G2L["17"];
-	local Frame = script.Parent
-	Frame.loadingcircle.Visible = true
-	Frame.LoadingGame.TextTransparency = 0
-	
-	while wait() do
-		Frame.loadingcircle.Rotation = Frame.loadingcircle.Rotation + 5
-	end
-end;
-task.spawn(C_17);
--- StarterGui.INTRO WIE GTA.Background.Handle
-local function C_19()
-local script = G2L["19"];
-	local ContentProvider = game:GetService("ContentProvider")
-	local SoundService = game:GetService("SoundService")
-	local playerMod = require(game:GetService("Players").LocalPlayer.PlayerScripts:WaitForChild("PlayerModule"))
-	local StarterGui = game:GetService("StarterGui")
-	
-	local controls = playerMod:GetControls()
-	
-	controls:Disable()
-	
-	local StarterGui = game:GetService("StarterGui")
-	local player = game.Players.LocalPlayer
-	local pg = player:WaitForChild("PlayerGui")
-	
-	
-	local Background = script.Parent
-	local Icones = Background.Icones
-	local rockstarI = Icones.Rockstar.Icone
-	local robloxI = Icones.Roblox.Icone
-	local custom = Icones.Custom.Icone
-	
-	local cutsceneModule = require(script.Parent.CutsceneModule)
-	local Sound = SoundService.GTA4MenuSound
-	
-	local frame = {
-		Background,
-		Sound,
-	}
-	
-	ContentProvider:PreloadAsync(frame,function()
-		
-	end)
-	
-	if not game:IsLoaded() then
-		game.Loaded:Wait()
-	end
-	repeat wait() until #pg:GetDescendants()>=#game.StarterGui:GetDescendants()
-	
-	wait(2)
-	Sound:Play()
-	
-	wait(3)
-	
-	cutsceneModule.AnimarIcone(rockstarI,true)
-	cutsceneModule.AnimarIcone(robloxI,true)
-	cutsceneModule.AnimarIcone(custom,true)
-	
-	wait(3)
-	
-	local combos = cutsceneModule.randomizarCombos()
-	
-	for i=1, #combos  do
-		cutsceneModule.Animar(combos[i])
-	end
-	wait(5)
-	for i=0.5,0,-0.05 do
-		wait()
-		Sound.Volume = i
-	end
-	for i=0,1,0.1 do
-		wait()
-		Background.Transparency = i
-	end
-	
-	Background.Visible = false
-	controls:Enable()
-	StarterGui:SetCore("ResetButtonCallback",true)
-	StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.All, true)
-	
-end;
-task.spawn(C_19);
--- StarterGui.INTRO WIE GTA.Background.CoresGui
-local function C_1b()
-local script = G2L["1b"];
-	wait()
-	
-	local StarterGui = game:GetService("StarterGui")
-	
-	StarterGui:SetCore("ResetButtonCallback",false)
-	StarterGui:SetCoreGuiEnabled(Enum.CoreGuiType.All, false)
-	
-end;
-task.spawn(C_1b);
+local function anticipate(time)
+    if debounce then return false end
 
-return G2L["1"], require;
+    if lastTime then
+        local deltaTime = time - lastTime
+        if math.abs(deltaTime) <= 25 then
+            return true
+        end
+    end
+
+    lastTime = time
+    return false
+end
+
+
+local function chooseNewFocusedBall()
+    local balls = Balls:GetChildren()
+    for _, ball in ipairs(balls) do
+        if ball:GetAttribute("realBall") == true or ball:GetAttribute("target") ~= nil then
+            return ball
+        end
+    end
+    return nil
+end
+
+local function handleBall(ball)
+    if not ball or debounce then return end
+
+    local humanoidRootPart = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+    if ball:FindFirstChild("zoomies") then
+        local targetPlayer = ball:GetAttribute("target")
+        if targetPlayer then
+            if targetPlayer == LocalPlayer.Name then
+        
+                if humanoidRootPart then
+                    local timeToReachTarget = calculateProjectileTime(ball.Position, humanoidRootPart.Position, ball.Velocity)
+                    local distanceToTarget = calculateDistance(ball.Position, humanoidRootPart.Position)
+                    if canObjectParry(ball.Position, humanoidRootPart.Position, ball.Velocity, humanoidRootPart.Velocity) then
+                        parry()
+                        lastTime = nil
+                        debounce = true
+                        local signal = nil
+                        signal = RunService.Stepped:Connect(function()
+                            if ball:GetAttribute("target") ~= LocalPlayer.Name or not ball or not Workspace.Alive:FindFirstChild(LocalPlayer.Name) then
+                                debounce = false
+                                signal:Disconnect()
+                            end
+                        end)
+                    end
+                end
+            else
+                
+                local parriedBy = ball:GetAttribute("parriedBy")
+                if parriedBy and parriedBy == LocalPlayer.Name then
+                
+                    lastTime = nil
+                    debounce = false
+                end
+            end
+        end
+    end
+end
+
+local function init()
+    Balls.ChildAdded:Connect(function(ball)
+        handleBall(ball)
+    end)
+
+    for _, ball in ipairs(Balls:GetChildren()) do
+        handleBall(ball)
+    end
+end
+
+init()
+end)
+
+KillingCheats:CreateButton("Auto Spam", function()
+local function get_plr()
+        return game.Players.LocalPlayer
+    end
+
+    local function get_plrChar()
+        local plrChar = get_plr().Character
+        return plrChar
+    end
+
+    local function get_plrRP()
+        local plrChar = get_plrChar()
+        local plrRP = plrChar and plrChar:FindFirstChild("HumanoidRootPart")
+        return plrRP
+    end
+
+    local function get_PlayersNumber()
+        local Alive = workspace:WaitForChild("Alive", 20):GetChildren()
+        local PlayersNumber = 0
+        for _, v in pairs(Alive) do
+            if v and v:FindFirstChild("Humanoid") and v.Humanoid.Health > 50 then
+                PlayersNumber = PlayersNumber + 1
+            end
+        end
+        return PlayersNumber
+    end
+
+    local function get_ProxyPlayer()
+        local Players = workspace:WaitForChild("Alive"):GetChildren()
+        local Distance = math.huge
+        local plr = game.Players.LocalPlayer
+        local plrRP = get_plrRP()
+        local Player = nil
+
+        for _, plr1 in pairs(Players) do
+            if plr1.Name ~= plr.Name and plrRP and plr1:FindFirstChild("HumanoidRootPart") and plr1:FindFirstChild("Humanoid") and plr1.Humanoid.Health > 50 then
+                local magnitude = (plr1.HumanoidRootPart.Position - plrRP.Position).Magnitude
+                if magnitude <= Distance then
+                    Distance = magnitude
+                    Player = plr1
+                end
+            end
+        end
+        return Player
+    end
+
+    local function Click_Button()
+        task.spawn(function()
+            local plr = game.Players.LocalPlayer
+            local plrFind = workspace.Alive:FindFirstChild(plr.Name)
+            if plrFind then
+                local plrs = #workspace:WaitForChild("Alive", 10):GetChildren()
+                if plrs > 1 then
+                    local args = {
+                        [1] = 1.5,
+                        [2] = CFrame.new(-254, 112, -119) * CFrame.Angles(-2, 0, 2),
+                        [3] = { ["2617721424"] = Vector3.new(-273, -724, -20) },
+                        [4] = { [1] = 910, [2] = 154 }
+                    }
+                    game:GetService("ReplicatedStorage").Remotes.ParryAttempt:FireServer(unpack(args))
+                    task.wait(0.1)  
+                end
+            end
+        end)
+    end
+
+    task.spawn(function()
+        while task.wait() do
+            if getgenv().SpamClickA then
+                Click_Button()
+            end
+        end
+    end)
+
+    local function DetectSpam()
+        local Balls = workspace:WaitForChild("Balls", 20)
+
+        local OldPos = Vector3.new()
+        local OldTick1 = tick()
+
+        local OldBall = Balls
+        local TargetPlayer = ""
+        local SpamNum = 0
+        local BallSpeed = 0
+        local BallDistance = 0
+
+        task.spawn(function()
+            local OldTick = tick()
+            local OldPos = Vector3.new()
+            while getgenv().DetectSpam do
+                task.wait()
+                local plrRP = get_plrRP()
+                local Ball = Balls:FindFirstChildOfClass("Part")
+                if plrRP and Ball then
+                    BallDistance = (plrRP.Position - Ball.Position).Magnitude
+                    BallSpeed = (OldPos - Ball.Position).Magnitude
+                    if tick() - OldTick >= 1 / 60 then
+                        OldTick = tick()
+                        OldPos = Ball.Position
+                    end
+                end
+            end
+        end)
+
+        while getgenv().DetectSpam do
+            task.wait()
+            local Ball = Balls:FindFirstChildOfClass("Part")
+            local plrRP = get_plrRP()
+            local ProxyPlayer = get_ProxyPlayer()
+
+            if not Ball then
+                getgenv().SpamClickA = false
+            end
+
+            if Ball and Ball:GetAttribute("realBall") and OldBall ~= Ball then
+                Ball.Changed:Connect(function()
+                    task.wait()
+                    local Ball = Balls:FindFirstChildOfClass("Part")
+
+                    if Ball then
+                        TargetPlayer = Ball:GetAttribute("target")
+
+                        if ProxyPlayer and TargetPlayer == ProxyPlayer.Name or get_plr() and TargetPlayer == get_plr().Name then
+                            SpamNum = SpamNum + 1
+                            if SpamNum >= 3 then
+                                getgenv().SpamClickA = true
+                            end
+                        else
+                            SpamNum = 0
+                        end
+
+                        local args = ProxyPlayer and ProxyPlayer:FindFirstChild("HumanoidRootPart")
+                        local HL1 = ProxyPlayer and ProxyPlayer:FindFirstChild("Highlight")
+                        local HL2 = get_plrChar() and get_plrChar():FindFirstChild("Highlight")
+
+                        if plrRP and HL1 and args or plrRP and HL2 and args then
+                            local DistancePlayer = (ProxyPlayer.HumanoidRootPart.Position - plrRP.Position).Magnitude
+                            local DistanceBall = (Ball.Position - plrRP.Position).Magnitude
+
+                            if get_PlayersNumber() < 3 then
+                                if DistancePlayer <= 30 and DistanceBall <= 35 then
+                                    getgenv().SpamClickA = true
+                                else
+                                    getgenv().SpamClickA = false
+                                end
+                            else
+                                if DistancePlayer <= 30 and DistanceBall <= 35 then
+                                    getgenv().SpamClickA = true
+                                else
+                                    getgenv().SpamClickA = false
+                                end
+                            end
+                        else
+                            getgenv().SpamClickA = false
+                        end
+                    end
+                end)
+                OldBall = Ball
+            end
+        end
+    end
+
+    getgenv().DetectSpam = true
+    DetectSpam()
+end)
+
+KillingCheats:CreateButton("Delete Clash", function()
+local RunService = game:GetService("RunService")
+
+local function removeParticleEmitters(object)
+    for _, descendant in pairs(object:GetDescendants()) do
+        if descendant:IsA("ParticleEmitter") then
+            descendant:Destroy()
+        end
+    end
+end
+
+local function onRepeatRemoval()
+    removeParticleEmitters(workspace)
+end
+
+RunService.Heartbeat:Connect(function(deltaTime)
+    onRepeatRemoval()
+end)
+end) 
+
+KillingCheats:CreateButton("Discord Server", function()
+setclipboard("https://discord.gg/nyWZdufrK6")
+end)
+
+
